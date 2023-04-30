@@ -22,7 +22,7 @@ public class RolEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idRol;
+    private Long idRol;
     private String name;
     private String description;
     @OneToMany(mappedBy = "rol")

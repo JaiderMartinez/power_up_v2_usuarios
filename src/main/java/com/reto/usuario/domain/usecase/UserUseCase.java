@@ -6,12 +6,13 @@ import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
+import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.utils.PasswordEncoderUtils;
 import com.reto.usuario.domain.utils.TokenUtils;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import com.reto.usuario.infrastructure.exceptions.EmailNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,8 @@ public class UserUseCase implements IUserUseCasePort {
     public void registerUserWithOwnerRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
         userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
-        userModel.setRol(rolPersistenceDomainPort.findByNombre("PROPIETARIO"));
+        RolModel rol = rolPersistenceDomainPort.findByName("PROPIETARIO");
+        userModel.setRol(rol);
         userPersistenceDomainPort.saveUser(userModel);
     }
 
@@ -45,11 +47,11 @@ public class UserUseCase implements IUserUseCasePort {
     }
 
     private void validateUserFieldsEmpty(UserModel user) {
-        if( user.getIdentificationDocument() == null || user.getName().replaceAll(" ", "").isEmpty() ||
-                user.getLastName().replaceAll(" ", "").isEmpty() ||
-                user.getCellPhone().replaceAll(" ", "").isEmpty() ||
-                user.getEmail().replaceAll(" ", "").isEmpty() ||
-                user.getPassword().replaceAll(" ", "").isEmpty() ) {
+        if( user.getIdentificationDocument() == null || user.getName().replace(" ", "").isEmpty() ||
+                user.getLastName().replace(" ", "").isEmpty() ||
+                user.getCellPhone().replace(" ", "").isEmpty() ||
+                user.getEmail().replace(" ", "").isEmpty() ||
+                user.getPassword().replace(" ", "").isEmpty() ) {
             throw new EmptyFieldsException("Fields cannot be empty");
         }
     }
@@ -65,13 +67,13 @@ public class UserUseCase implements IUserUseCasePort {
     }
 
     private void validateUserCellPhone(String phoneUser) {
-        String phoneUserNoSpaces = phoneUser.replaceAll(" ", "");
+        String phoneUserNoSpaces = phoneUser.replace(" ", "");
         if(phoneUserNoSpaces.startsWith("+")){
-            if(!phoneUserNoSpaces.matches("\\+\\d+") || phoneUserNoSpaces.length() > 13 ) {
+            if(!phoneUserNoSpaces.matches("\\+\\d+") || phoneUserNoSpaces.length() != 13 ) {
                 throw new InvalidCellPhoneFormatException("The cell phone format is wrong");
             }
         } else {
-            if (phoneUserNoSpaces.length() != 10 || !phoneUserNoSpaces.matches("\\d")) {
+            if (phoneUserNoSpaces.length() != 10 || !phoneUserNoSpaces.matches("\\d+")) {
                 throw new InvalidCellPhoneFormatException("The cell phone format is wrong");
             }
         }
@@ -88,6 +90,10 @@ public class UserUseCase implements IUserUseCasePort {
 
     @Override
     public UserModel findUsuarioByEmail(String email) {
-        return userPersistenceDomainPort.findByEmail(email);
+        UserModel userModel = userPersistenceDomainPort.findByEmail(email);
+        if (userModel == null) {
+            throw new EmailNotFoundException("Email not found");
+        }
+        return userModel;
     }
 }

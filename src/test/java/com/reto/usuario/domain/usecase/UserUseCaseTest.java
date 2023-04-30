@@ -1,6 +1,7 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.dto.AuthCredentials;
+import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
@@ -8,6 +9,7 @@ import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.utils.TokenUtils;
+import com.reto.usuario.infrastructure.exceptions.EmailNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +41,7 @@ class UserUseCaseTest {
 
     @Test
     void registerUserWithOwnerRole() {
-        when(rolPersistenceDomainPort.findByNombre("PROPIETARIO")).thenReturn(FactoryUserModelTest.rolModel());
+        when(rolPersistenceDomainPort.findByName("PROPIETARIO")).thenReturn(FactoryUserModelTest.rolModel());
         when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModelWithoutRole());
         userUseCase.registerUserWithOwnerRole(FactoryUserModelTest.userModel());
         verify(userPersistenceDomainPort).saveUser(any(UserModel.class));
@@ -63,16 +65,12 @@ class UserUseCaseTest {
     void findUsuarioByCorreo() {
         when(userPersistenceDomainPort.findByEmail("test-email@gmail.com")).thenReturn(FactoryUserModelTest.userModel());
         UserModel userModel = userUseCase.findUsuarioByEmail("test-email@gmail.com");
-        Assertions.assertEquals(FactoryUserModelTest.userModel().getEmail(), userModel.getEmail());
         verify(userPersistenceDomainPort).findByEmail(any(String.class));
-        Assertions.assertThrows(
-                UsernameNotFoundException.class,
-                () -> { userUseCase.findUsuarioByEmail("test-email-not-found@gmail.com"); }
-        );
+        Assertions.assertEquals(FactoryUserModelTest.userModel().getEmail(), userModel.getEmail());
     }
 
     @Test
-    void throwEmptyFieldsExceptionWhenRegisterUserWithOwnerRole() {
+    void throwEmptyFieldsExceptionWhenRegisterUser() {
         UserModel userModelWithFieldsEmpty =
                 FactoryUserModelTest.userModelFieldsEmpty();
         Assertions.assertThrows(
@@ -82,7 +80,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void throwEmailStructureInvalidExceptionWhenRegisterUserWithOwnerRole() {
+    void throwEmailStructureInvalidExceptionWhenRegisterUser() {
         UserModel userModelEmailStructureInvalid =
                 FactoryUserModelTest.userModelEmailStructureInvalid();
         Assertions.assertThrows(
@@ -92,7 +90,26 @@ class UserUseCaseTest {
     }
 
     @Test
-    void throwInvalidCellPhoneFormatExceptionWhenRegisterUserWithOwnerRole() {
+    void throwEmailExistsExceptionWhenRegisterUser() {
+        UserModel userModel1 = FactoryUserModelTest.userModel();
+        when(userPersistenceDomainPort.saveUser(userModel1)).thenReturn(userModel1);
+        userUseCase.registerUserWithOwnerRole(userModel1);
+
+        UserModel userModel2 = FactoryUserModelTest.userModel();
+        when(userPersistenceDomainPort.saveUser(userModel2)).thenThrow(new EmailExistsException("Email already exists"));
+
+    }
+
+    @Test
+    void throwEmailNotFoundExceptionWhenFindEmail() {
+        Assertions.assertThrows(
+                EmailNotFoundException.class,
+                () -> { userUseCase.findUsuarioByEmail("email-not-exists@gmail.com"); }
+        );
+    }
+
+    @Test
+    void throwInvalidCellPhoneFormatExceptionWhenRegisterUser() {
         UserModel userModelCellPhoneInvalid =
                 FactoryUserModelTest.userModelCellPhoneInvalid();
         Assertions.assertThrows(

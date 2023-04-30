@@ -22,14 +22,14 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long idUser;
+    private Long idUser;
     private String name;
     private String lastName;
     private Long identificationDocument;
     private String cellPhone;
     private String email;
     private String password;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "id_rol")
     private RolEntity rol;
 }

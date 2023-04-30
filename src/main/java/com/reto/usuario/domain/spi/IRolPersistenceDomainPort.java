@@ -4,5 +4,5 @@ import com.reto.usuario.domain.model.RolModel;
 
 public interface IRolPersistenceDomainPort {
 
-    RolModel findByNombre(String nombre);
+    RolModel findByName(String name);
 }

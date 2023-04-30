@@ -16,7 +16,7 @@ public class RolPersistenceDomainPortImpl implements IRolPersistenceDomainPort {
     }
 
     @Override
-    public RolModel findByNombre(String name) {
+    public RolModel findByName(String name) {
         return rolEntityMapper.toRolModel(rolRepositoryMysql.findByName(name));
     }
 }

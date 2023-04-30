@@ -82,11 +82,10 @@ public class FactoryUserModelTest {
         userModel.setPassword("12345678");
         userModel.setCellPhone("+574053986322");
         userModel.setIdentificationDocument(7388348534l);
-        userModel.setEmail("test@gmail.com");
+        userModel.setEmail("test@example.com");
         userModel.setRol(rolModel);
         return userModel;
     }
-
 
 
 }

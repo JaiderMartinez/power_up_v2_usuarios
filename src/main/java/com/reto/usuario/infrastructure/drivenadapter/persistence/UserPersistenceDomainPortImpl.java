@@ -5,7 +5,6 @@ import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
 import com.reto.usuario.infrastructure.exceptions.EmailNotFoundException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 
 public class UserPersistenceDomainPortImpl implements IUserPersistenceDomainPort {
@@ -26,12 +25,8 @@ public class UserPersistenceDomainPortImpl implements IUserPersistenceDomainPort
 
     @Override
     public UserModel findByEmail(String email) {
-        UserModel userModel = userEntityMapper.toUserModel(
+        return userEntityMapper.toUserModel(
                 userRepositoryMysql.findByEmail(email).orElse(null));
-        if (userModel == null) {
-            throw new EmailNotFoundException("Email not found");
-        }
-        return userModel;
     }
 
     @Override
