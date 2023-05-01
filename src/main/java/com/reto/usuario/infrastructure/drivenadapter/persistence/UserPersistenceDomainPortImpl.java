@@ -25,8 +25,12 @@ public class UserPersistenceDomainPortImpl implements IUserPersistenceDomainPort
 
     @Override
     public UserModel findByEmail(String email) {
-        return userEntityMapper.toUserModel(
+        UserModel userModel = userEntityMapper.toUserModel(
                 userRepositoryMysql.findByEmail(email).orElse(null));
+        if (userModel == null) {
+            throw new EmailNotFoundException("Email not found");
+        }
+        return userModel;
     }
 
     @Override

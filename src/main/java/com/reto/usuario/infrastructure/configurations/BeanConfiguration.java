@@ -1,8 +1,10 @@
 package com.reto.usuario.infrastructure.configurations;
 
+import com.reto.usuario.domain.api.IAuthUseCasePort;
 import com.reto.usuario.domain.api.IUserUseCasePort;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
+import com.reto.usuario.domain.usecase.AuthUseCase;
 import com.reto.usuario.domain.usecase.UserUseCase;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IRolEntityMapper;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
@@ -36,6 +38,11 @@ public class BeanConfiguration {
     @Bean
     public IUserUseCasePort userUseCasePort() {
         return new UserUseCase(userPersistencePort(), rolesPersistencePort());
+    }
+
+    @Bean
+    public IAuthUseCasePort authUseCasePort() {
+        return new AuthUseCase(userPersistencePort());
     }
 
 }

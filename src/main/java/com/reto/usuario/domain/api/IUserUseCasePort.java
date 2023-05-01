@@ -7,7 +7,5 @@ public interface IUserUseCasePort {
 
     void registerUserWithOwnerRole(UserModel userModel);
 
-    String signInUseCase(AuthCredentials authCredentials);
-
-    UserModel findUsuarioByEmail(String email);
+    UserModel findUserByEmail(String email);
 }

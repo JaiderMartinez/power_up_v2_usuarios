@@ -2,6 +2,7 @@ package com.reto.usuario.infrastructure.entrypoint;
 
 import com.reto.usuario.application.dto.request.AuthCredentialsRequest;
 import com.reto.usuario.application.dto.request.UserRequestDto;
+import com.reto.usuario.application.handler.IAuthService;
 import com.reto.usuario.application.handler.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserRestController {
 
     private final IUserService userService;
+    private final IAuthService authService;
 
     @Operation(summary = "Add a new User with rol owner")
     @ApiResponses(value = {
@@ -57,7 +59,7 @@ public class UserRestController {
             required = true,
             schema = @Schema(implementation = AuthCredentialsRequest.class))
             @RequestBody AuthCredentialsRequest authCredentialsRequest) {
-        return ResponseEntity.ok(userService.singIn(authCredentialsRequest));
+        return ResponseEntity.ok(authService.singIn(authCredentialsRequest));
     }
 
     @Operation(summary = "token verification")

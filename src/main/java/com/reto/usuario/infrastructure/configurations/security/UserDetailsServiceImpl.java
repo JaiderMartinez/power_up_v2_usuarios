@@ -21,14 +21,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserModel userModel = userUseCasePort.findUsuarioByEmail(username);
+        UserModel userModel = userUseCasePort.findUserByEmail(username);
         List<GrantedAuthority> authority = new ArrayList<>();
         authority.add(new SimpleGrantedAuthority("ROLE_" + userModel.getRol().getName()));
         return new UserDetailsImpl(userModel.getEmail(), userModel.getPassword(), authority);
     }
 
     public boolean isValidateRoles(String email, String rol) {
-        UserModel userModel = userUseCasePort.findUsuarioByEmail(email);
+        UserModel userModel = userUseCasePort.findUserByEmail(email);
         if(userModel.getRol().getName().equals(rol)) {
             return true;
         }

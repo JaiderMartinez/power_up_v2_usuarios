@@ -1,7 +1,6 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.api.IUserUseCasePort;
-import com.reto.usuario.domain.dto.AuthCredentials;
 import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
@@ -11,11 +10,6 @@ import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.utils.PasswordEncoderUtils;
-import com.reto.usuario.domain.utils.TokenUtils;
-import com.reto.usuario.infrastructure.exceptions.EmailNotFoundException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserUseCase implements IUserUseCasePort {
 
@@ -80,20 +74,7 @@ public class UserUseCase implements IUserUseCasePort {
     }
 
     @Override
-    public String signInUseCase(AuthCredentials authCredentials) {
-        UserModel user = findUsuarioByEmail( authCredentials.getEmail() );
-        List<String> authority = new ArrayList<>();
-        authority.add("ROLE_" + user.getRol().getName());
-        return TokenUtils
-                .createToken( user.getEmail(), authority, user.getName(), user.getLastName() );
-    }
-
-    @Override
-    public UserModel findUsuarioByEmail(String email) {
-        UserModel userModel = userPersistenceDomainPort.findByEmail(email);
-        if (userModel == null) {
-            throw new EmailNotFoundException("Email not found");
-        }
-        return userModel;
+    public UserModel findUserByEmail(String email) {
+        return userPersistenceDomainPort.findByEmail(email);
     }
 }
