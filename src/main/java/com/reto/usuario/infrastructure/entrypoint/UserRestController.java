@@ -2,6 +2,7 @@ package com.reto.usuario.infrastructure.entrypoint;
 
 import com.reto.usuario.application.dto.request.AuthCredentialsRequest;
 import com.reto.usuario.application.dto.request.UserRequestDto;
+import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.handler.IAuthService;
 import com.reto.usuario.application.handler.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,10 +35,11 @@ public class UserRestController {
             @ApiResponse(responseCode = "400", description = "Wrong email structure", content = @Content),
             @ApiResponse(responseCode = "400", description = "Fields cannot be empty", content = @Content),
             @ApiResponse(responseCode = "400", description = "The cell phone format is wrong", content = @Content),
+            @ApiResponse(responseCode = "403", description = "The user does not have the admin role", content = @Content),
             @ApiResponse(responseCode = "409", description = "The email already exists", content = @Content)
     })
-    @PreAuthorize(value = "hasRole('ADMINISTRADOR')")
     @PostMapping(value = "/")
+    @PreAuthorize(value = "hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> registerUserAsOwner(@Parameter(
             description = "The user owner object to create",
             required = true,
@@ -45,6 +47,22 @@ public class UserRestController {
             @RequestBody UserRequestDto userRequestDto) {
         userService.registerUserWithOwnerRole(userRequestDto);
             return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Add a new User with rol employee")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User created", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Wrong email structure", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Fields cannot be empty", content = @Content),
+            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong", content = @Content),
+            @ApiResponse(responseCode = "403", description = "The user does not have the owner role", content = @Content),
+            @ApiResponse(responseCode = "409", description = "The email already exists", content = @Content)
+    })
+    @PostMapping(value = "/employee")
+    @PreAuthorize(value = "hasRole('PROPIETARIO')")
+    public ResponseEntity<Void> registerUserAsEmployee(@RequestBody UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto) {
+        userService.registerUserWithEmployeeRole(userRequestToCreateEmployeeDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "Login to get token")

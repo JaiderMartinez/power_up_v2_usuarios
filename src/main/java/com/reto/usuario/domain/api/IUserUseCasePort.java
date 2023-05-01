@@ -7,5 +7,7 @@ public interface IUserUseCasePort {
 
     void registerUserWithOwnerRole(UserModel userModel);
 
+    void registerUserWithEmployeeRole(UserModel userModel);
+
     UserModel findUserByEmail(String email);
 }

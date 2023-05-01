@@ -5,6 +5,7 @@ import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
+import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
@@ -28,6 +29,20 @@ public class UserUseCase implements IUserUseCasePort {
         userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
         RolModel rol = rolPersistenceDomainPort.findByName("PROPIETARIO");
         userModel.setRol(rol);
+        userPersistenceDomainPort.saveUser(userModel);
+    }
+
+    @Override
+    public void registerUserWithEmployeeRole(UserModel userModel) {
+        restrictionsWhenSavingAUser(userModel);
+        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
+        RolModel rolModel = rolPersistenceDomainPort.findByIdRol(userModel.getRol().getIdRol());
+        if(rolModel == null) {
+            throw new RolNotFoundException("The rol not found");
+        } else if(!rolModel.getName().equals("EMPLEADO") ) {
+            throw new RolNotFoundException("The rol is different from employee");
+        }
+        userModel.setRol(rolModel);
         userPersistenceDomainPort.saveUser(userModel);
     }
 
