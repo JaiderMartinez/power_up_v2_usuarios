@@ -59,7 +59,7 @@ public class WebSecurityConfiguration {
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
                                 "/v3/api-docs/**").permitAll()
-                        .antMatchers("/user-micro/user/login")
+                        .antMatchers("/user-micro/user/login", "/user-micro/user/customer")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

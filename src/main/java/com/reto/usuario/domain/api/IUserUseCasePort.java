@@ -1,6 +1,5 @@
 package com.reto.usuario.domain.api;
 
-import com.reto.usuario.domain.dto.AuthCredentials;
 import com.reto.usuario.domain.model.UserModel;
 
 public interface IUserUseCasePort {
@@ -9,5 +8,9 @@ public interface IUserUseCasePort {
 
     void registerUserWithEmployeeRole(UserModel userModel);
 
+    void registerUserWithCustomerRole(UserModel userModel);
+
     UserModel findUserByEmail(String email);
+
+    UserModel getUserById(Long idUser);
 }

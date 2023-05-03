@@ -6,6 +6,7 @@ import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
+import com.reto.usuario.domain.exceptions.UserNotFoundException;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
@@ -36,14 +37,26 @@ public class UserUseCase implements IUserUseCasePort {
     public void registerUserWithEmployeeRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
         userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
-        RolModel rolModel = rolPersistenceDomainPort.findByIdRol(userModel.getRol().getIdRol());
+        userModel.setRol(findRoleByIdAndCompareRoleName("EMPLEADO", userModel.getRol().getIdRol()));
+        userPersistenceDomainPort.saveUser(userModel);
+    }
+
+    @Override
+    public void registerUserWithCustomerRole(UserModel userModel) {
+        restrictionsWhenSavingAUser(userModel);
+        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
+        userModel.setRol(findRoleByIdAndCompareRoleName("CLIENTE", userModel.getRol().getIdRol()));
+        userPersistenceDomainPort.saveUser(userModel);
+    }
+
+    private RolModel findRoleByIdAndCompareRoleName(String roleName, Long idRol) {
+        RolModel rolModel = rolPersistenceDomainPort.findByIdRol(idRol);
         if(rolModel == null) {
             throw new RolNotFoundException("The rol not found");
-        } else if(!rolModel.getName().equals("EMPLEADO") ) {
-            throw new RolNotFoundException("The rol is different from employee");
+        } else if(!rolModel.getName().equals(roleName) ) {
+            throw new RolNotFoundException("The rol is different from customer");
         }
-        userModel.setRol(rolModel);
-        userPersistenceDomainPort.saveUser(userModel);
+        return rolModel;
     }
 
     private void restrictionsWhenSavingAUser(UserModel userModel) {
@@ -91,5 +104,14 @@ public class UserUseCase implements IUserUseCasePort {
     @Override
     public UserModel findUserByEmail(String email) {
         return userPersistenceDomainPort.findByEmail(email);
+    }
+
+    @Override
+    public UserModel getUserById(Long idUser) {
+        UserModel userModel = userPersistenceDomainPort.findById(idUser);
+        if(userModel == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        return userModel;
     }
 }
