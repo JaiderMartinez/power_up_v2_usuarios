@@ -4,10 +4,11 @@ import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
+import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.infrastructure.drivenadapter.exceptions.EmailNotFoundException;
+import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -33,11 +36,27 @@ class UserUseCaseTest {
 
 
     @Test
-    void registerUserWithOwnerRole() {
+    void mustRegisterUserWithOwnerRole() {
         when(rolPersistenceDomainPort.findByName("PROPIETARIO")).thenReturn(FactoryUserModelTest.rolModel());
-        when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModelWithoutRole());
+        when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModelWithOwnerRole());
         userUseCase.registerUserWithOwnerRole(FactoryUserModelTest.userModel());
         verify(userPersistenceDomainPort).saveUser(any(UserModel.class));
+    }
+
+    @Test
+    void mustRegisterUserWithEmployeeRole() {
+        when(rolPersistenceDomainPort.findByIdRol(3L)).thenReturn(FactoryUserModelTest.rolModelEmployee());
+        when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModelWithEmployeeRole());
+        userUseCase.registerUserWithEmployeeRole(FactoryUserModelTest.userModelWithEmployeeRole());
+        verify(userPersistenceDomainPort, times(1)).saveUser(any(UserModel.class));
+    }
+
+    @Test
+    void mustRegisterUserWithCustomerRole() {
+        when(rolPersistenceDomainPort.findByIdRol(4L)).thenReturn(FactoryUserModelTest.rolModelCustomer());
+        when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModelWithCustomerRole());
+        userUseCase.registerUserWithCustomerRole(FactoryUserModelTest.userModelWithCustomerRole());
+        verify(userPersistenceDomainPort, times(1)).saveUser(any(UserModel.class));
     }
 
     @Test
@@ -49,12 +68,25 @@ class UserUseCaseTest {
     }
 
     @Test
+    void throwRolNotFoundExceptionWhenRegisterUser() {
+        when(rolPersistenceDomainPort.findByIdRol(3L)).thenReturn(FactoryUserModelTest.rolModelEmployee());
+
+        UserModel userModel = FactoryUserModelTest.userModelWithEmployeeRoleThatDoesNotExist();
+
+        assertThrows(
+                RolNotFoundException.class,
+                () -> userUseCase.registerUserWithEmployeeRole(
+                        FactoryUserModelTest.userModelWithEmployeeRoleThatDoesNotExist())
+        );
+    }
+
+    @Test
     void throwEmptyFieldsExceptionWhenRegisterUser() {
         UserModel userModelWithFieldsEmpty =
                 FactoryUserModelTest.userModelFieldsEmpty();
-        Assertions.assertThrows(
+        assertThrows(
                 EmptyFieldsException.class,
-                () -> { userUseCase.registerUserWithOwnerRole(userModelWithFieldsEmpty); }
+                () -> userUseCase.registerUserWithOwnerRole(userModelWithFieldsEmpty)
         );
     }
 
@@ -62,28 +94,28 @@ class UserUseCaseTest {
     void throwEmailStructureInvalidExceptionWhenRegisterUser() {
         UserModel userModelEmailStructureInvalid =
                 FactoryUserModelTest.userModelEmailStructureInvalid();
-        Assertions.assertThrows(
+        assertThrows(
                 InvalidEmailFormatException.class,
-                () -> { userUseCase.registerUserWithOwnerRole(userModelEmailStructureInvalid); }
+                () -> userUseCase.registerUserWithOwnerRole(userModelEmailStructureInvalid)
         );
     }
 
     @Test
     void throwEmailExistsExceptionWhenRegisterUser() {
-        UserModel userModel1 = FactoryUserModelTest.userModel();
-        when(userPersistenceDomainPort.saveUser(userModel1)).thenReturn(userModel1);
-        userUseCase.registerUserWithOwnerRole(userModel1);
-
-        UserModel userModel2 = FactoryUserModelTest.userModel();
-        when(userPersistenceDomainPort.saveUser(userModel2)).thenThrow(new EmailExistsException("Email already exists"));
-
+        when(userPersistenceDomainPort.existsByEmail(FactoryUserModelTest.userModel().getEmail())).thenReturn(true);
+        when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModel());
+        assertThrows(
+                EmailExistsException.class,
+                () -> userUseCase.registerUserWithOwnerRole(FactoryUserModelTest.userModel())
+        );
     }
 
     @Test
     void throwEmailNotFoundExceptionWhenFindEmail() {
-        Assertions.assertThrows(
+        when(userPersistenceDomainPort.findByEmail("test-exception@gmail.com")).thenReturn(FactoryUserModelTest.userModel());
+        assertThrows(
                 EmailNotFoundException.class,
-                () -> { userUseCase.findUserByEmail("email-not-exists@gmail.com"); }
+                () -> userUseCase.findUserByEmail("email-not-exist@gmail.com")
         );
     }
 
@@ -91,9 +123,9 @@ class UserUseCaseTest {
     void throwInvalidCellPhoneFormatExceptionWhenRegisterUser() {
         UserModel userModelCellPhoneInvalid =
                 FactoryUserModelTest.userModelCellPhoneInvalid();
-        Assertions.assertThrows(
+        assertThrows(
                 InvalidCellPhoneFormatException.class,
-                () -> { userUseCase.registerUserWithOwnerRole(userModelCellPhoneInvalid); }
+                () -> userUseCase.registerUserWithOwnerRole(userModelCellPhoneInvalid)
         );
     }
 }

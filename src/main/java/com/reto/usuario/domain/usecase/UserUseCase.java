@@ -12,6 +12,7 @@ import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.utils.PasswordEncoderUtils;
+import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 
 public class UserUseCase implements IUserUseCasePort {
 
@@ -103,7 +104,11 @@ public class UserUseCase implements IUserUseCasePort {
 
     @Override
     public UserModel findUserByEmail(String email) {
-        return userPersistenceDomainPort.findByEmail(email);
+        UserModel userModel = userPersistenceDomainPort.findByEmail(email);
+        if (userModel == null) {
+            throw new EmailNotFoundException("Email not found");
+        }
+        return userModel;
     }
 
     @Override

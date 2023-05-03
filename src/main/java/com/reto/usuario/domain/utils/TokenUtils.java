@@ -62,7 +62,7 @@ public class TokenUtils {
 
     public static void validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(ACCESS_TOKEN_SECRET.getBytes()).parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(ACCESS_TOKEN_SECRET.getBytes()).build().parseClaimsJws(token);
         } catch (MalformedJwtException e) {
             throw new TokenInvalidException("malformed token");
         } catch (UnsupportedJwtException e) {

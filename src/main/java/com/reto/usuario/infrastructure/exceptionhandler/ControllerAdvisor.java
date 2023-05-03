@@ -8,7 +8,7 @@ import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.exceptions.TokenInvalidException;
 import com.reto.usuario.domain.exceptions.UserNotFoundException;
-import com.reto.usuario.infrastructure.drivenadapter.exceptions.EmailNotFoundException;
+import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;

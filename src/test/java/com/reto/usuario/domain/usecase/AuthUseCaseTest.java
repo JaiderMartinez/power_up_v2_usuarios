@@ -33,8 +33,8 @@ class AuthUseCaseTest {
                 FactoryUserModelTest.userModel());
         String token = authUseCase.signInUseCase(authCredentials);
         assertNotNull(token);
-        UsernamePasswordAuthenticationToken userAutheticated = TokenUtils.getAuthentication(token);
-        Assertions.assertEquals(FactoryUserModelTest.userModel().getEmail(), userAutheticated.getName());
+        UsernamePasswordAuthenticationToken userAuth = TokenUtils.getAuthentication(token);
+        Assertions.assertEquals(FactoryUserModelTest.userModel().getEmail(), userAuth.getName());
         verify(userPersistenceDomainPort).findByEmail(authCredentials.getEmail());
     }
 }
