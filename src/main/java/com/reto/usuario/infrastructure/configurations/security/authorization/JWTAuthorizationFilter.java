@@ -37,13 +37,21 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().getAuthentication() == null) {
             String token = bearerToken.replace("Bearer ", "").trim();
 
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    TokenUtils.getAuthentication(token);
-            String rol = usernamePasswordAuthenticationToken.getAuthorities().stream()
+            if (!TokenUtils.validateToken(token)) {
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.getWriter().write(new ObjectMapper()
+                        .writeValueAsString(Collections.
+                                singletonMap("message", ExceptionResponse.TOKEN_INVALID.getMessage())));
+                return;
+            }
+
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = TokenUtils.getAuthentication(token);
+            String role = usernamePasswordAuthenticationToken.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()).get(0).replace("ROLE_", "");
-            if( !userDetailsService.isValidateRoles(usernamePasswordAuthenticationToken.getName(),
-                    rol )) {
+
+            if( !userDetailsService.isValidateRoles(usernamePasswordAuthenticationToken.getName(), role)) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter().write(new ObjectMapper()

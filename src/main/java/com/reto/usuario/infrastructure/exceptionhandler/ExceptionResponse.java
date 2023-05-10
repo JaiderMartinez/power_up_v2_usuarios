@@ -12,6 +12,7 @@ public enum ExceptionResponse {
     ROL_NOT_FOUND("Rol Not Found or invalid role"),
     AUTHENTICATION_FAILED("Failed login by token"),
     ROLE_IN_TOKEN_IS_INVALID("The user role is incorrect, please log in again"),
+    TOKEN_INVALID("token not supported"),
     ACCESS_DENIED("Prohibited you do not have the necessary role for authorization");
 
     private final String message;

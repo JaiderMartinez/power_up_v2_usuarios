@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -41,12 +42,11 @@ public class TokenUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(expirationDate)
                 .addClaims(extra)
-                .signWith(SignatureAlgorithm.HS256, ACCESS_TOKEN_SECRET.getBytes())
+                .signWith(Keys.hmacShaKeyFor(ACCESS_TOKEN_SECRET.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public static UsernamePasswordAuthenticationToken getAuthentication(String token) {
-        validateToken(token);
         try {
             JWT jwt = JWTParser.parse(token);
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
@@ -60,19 +60,13 @@ public class TokenUtils {
         }
     }
 
-    public static void validateToken(String token) {
+    public static Boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(ACCESS_TOKEN_SECRET.getBytes()).build().parseClaimsJws(token);
-        } catch (MalformedJwtException e) {
-            throw new TokenInvalidException("malformed token");
-        } catch (UnsupportedJwtException e) {
-            throw new TokenInvalidException("token not supported");
-        } catch (ExpiredJwtException e) {
-            throw new TokenInvalidException("expired token");
-        } catch (IllegalArgumentException e) {
-            throw new TokenInvalidException("token empty");
-        } catch (SignatureException e) {
-            throw new TokenInvalidException("fail in signing");
+            return true;
+        } catch (MalformedJwtException | UnsupportedJwtException
+                 | ExpiredJwtException | IllegalArgumentException | SignatureException e) {
+            return false;
         }
     }
 }

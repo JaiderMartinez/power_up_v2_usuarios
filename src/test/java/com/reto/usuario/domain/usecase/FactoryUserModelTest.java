@@ -123,6 +123,7 @@ public class FactoryUserModelTest {
         rolModel.setName("PROPIETARIO");
         rolModel.setDescription("");
         UserModel userModel = new UserModel();
+        userModel.setIdUser(1L);
         userModel.setName("Luis");
         userModel.setLastName("Martinez");
         userModel.setPassword("12345678");
