@@ -4,7 +4,6 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.reto.usuario.domain.exceptions.AuthenticationFailedException;
-import com.reto.usuario.domain.exceptions.TokenInvalidException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -55,6 +54,21 @@ public class TokenUtils {
             return new UsernamePasswordAuthenticationToken(email, null,
                     rol.stream().map(SimpleGrantedAuthority::new)
                             .collect(Collectors.toList()));
+        } catch (ParseException e) {
+            throw new AuthenticationFailedException("Error token could not be read");
+        }
+    }
+
+    public static String getUsername(String tokenWithBearerPrefix) {
+        try {
+            String username;
+            if (tokenWithBearerPrefix.startsWith("Bearer ")) {
+                tokenWithBearerPrefix = tokenWithBearerPrefix.replace("Bearer ", "");
+            }
+            JWT jwt = JWTParser.parse(tokenWithBearerPrefix);
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            username = claims.getSubject();
+            return username;
         } catch (ParseException e) {
             throw new AuthenticationFailedException("Error token could not be read");
         }

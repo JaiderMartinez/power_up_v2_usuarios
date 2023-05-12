@@ -2,10 +2,12 @@ package com.reto.usuario.infrastructure.configurations;
 
 import com.reto.usuario.domain.api.IAuthUseCasePort;
 import com.reto.usuario.domain.api.IUserUseCasePort;
+import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientPlazoleta;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.usecase.AuthUseCase;
 import com.reto.usuario.domain.usecase.UserUseCase;
+import com.reto.usuario.infrastructure.drivenadapter.gateways.EmployeeRestaurantClientPlazoletaImpl;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IRolEntityMapper;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
 import com.reto.usuario.infrastructure.drivenadapter.persistence.RolPersistenceDomainPortImpl;
@@ -41,9 +43,13 @@ public class BeanConfiguration {
         return new BCryptPasswordEncoder();
     }
 
+    public IEmployeeRestaurantClientPlazoleta employeeRestaurantClientPlazoleta() {
+        return new EmployeeRestaurantClientPlazoletaImpl();
+    }
+
     @Bean
     public IUserUseCasePort userUseCasePort() {
-        return new UserUseCase(userPersistencePort(), rolesPersistencePort(), passwordEncoder());
+        return new UserUseCase(userPersistencePort(), rolesPersistencePort(), passwordEncoder(), employeeRestaurantClientPlazoleta());
     }
 
     @Bean

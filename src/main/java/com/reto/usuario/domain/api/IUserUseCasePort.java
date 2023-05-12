@@ -6,7 +6,7 @@ public interface IUserUseCasePort {
 
     void registerUserWithOwnerRole(UserModel userModel);
 
-    void registerUserWithEmployeeRole(UserModel userModel);
+    void registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix);
 
     void registerUserWithCustomerRole(UserModel userModel);
 

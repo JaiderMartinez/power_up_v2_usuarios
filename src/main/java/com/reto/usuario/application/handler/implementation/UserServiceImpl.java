@@ -29,18 +29,20 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void registerUserWithEmployeeRole(UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto) {
+    public void registerUserWithEmployeeRole(UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto, String tokenWithBearerPrefix) {
         RolModel rolModel = new RolModel();
         UserModel userModel = new UserModel();
+
         userModel.setName(userRequestToCreateEmployeeDto.getName());
         userModel.setLastName(userRequestToCreateEmployeeDto.getLastName());
         userModel.setCellPhone(userRequestToCreateEmployeeDto.getCellPhone());
         userModel.setEmail(userRequestToCreateEmployeeDto.getEmail());
         userModel.setPassword(userRequestToCreateEmployeeDto.getPassword());
         userModel.setIdentificationDocument(userRequestToCreateEmployeeDto.getIdentificationDocument());
+
         rolModel.setIdRol(userRequestToCreateEmployeeDto.getIdRol());
         userModel.setRol(rolModel);
-        userUseCasePort.registerUserWithEmployeeRole(userModel);
+        userUseCasePort.registerUserWithEmployeeRole(userModel, tokenWithBearerPrefix);
     }
 
     @Override

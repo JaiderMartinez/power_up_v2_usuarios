@@ -9,6 +9,8 @@ import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.exceptions.TokenInvalidException;
 import com.reto.usuario.domain.exceptions.UserNotFoundException;
 import com.reto.usuario.domain.exceptions.EmailNotFoundException;
+import com.reto.usuario.infrastructure.drivenadapter.exceptions.EmployeeRestaurantExistException;
+import com.reto.usuario.infrastructure.drivenadapter.exceptions.RestaurantNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -70,7 +73,7 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleTokenInvalidException(
             TokenInvalidException ignoredTokenInvalidException) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.AUTHENTICATION_FAILED.getMessage()));
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.TOKEN_INVALID.getMessage()));
     }
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -92,6 +95,27 @@ public class ControllerAdvisor {
             RolNotFoundException ignoredRolNotFoundException) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.ROL_NOT_FOUND.getMessage()));
+    }
+
+    @ExceptionHandler(EmployeeRestaurantExistException.class)
+    public ResponseEntity<Map<String, String>> handleEmployeeRestaurantExistException(
+            EmployeeRestaurantExistException ignoredEmployeeRestaurantExistException) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.EMPLOYEE_RESTAURANT_EXIST.getMessage()));
+    }
+
+    @ExceptionHandler(SocketException.class)
+    public ResponseEntity<Map<String, String>> handleSocketException(
+            SocketException ignoredSocketException) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.UNEXPECTED_ERROR.getMessage()));
+    }
+
+    @ExceptionHandler(RestaurantNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantNotFoundException(
+            RestaurantNotFoundException ignoredRestaurantNotFoundException) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.RESTAURANT_NOT_FOUND.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

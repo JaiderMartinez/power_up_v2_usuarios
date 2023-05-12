@@ -5,5 +5,5 @@ import com.reto.usuario.application.dto.response.TokenResponseDto;
 
 public interface IAuthService {
 
-    public TokenResponseDto singIn(AuthCredentialsRequest authCredentialsRequest);
+    TokenResponseDto singIn(AuthCredentialsRequest authCredentialsRequest);
 }

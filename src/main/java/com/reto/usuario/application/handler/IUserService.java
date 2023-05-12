@@ -9,7 +9,7 @@ public interface IUserService {
 
     void registerUserWithOwnerRole(UserRequestDto userRequestDto);
 
-    void registerUserWithEmployeeRole(UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto);
+    void registerUserWithEmployeeRole(UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto, String tokenWithBearerPrefix);
 
     void registerUserWithCustomerRole(CustomerRequestDto customerRequestDto);
 

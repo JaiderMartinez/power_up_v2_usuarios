@@ -1,17 +1,20 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.api.IUserUseCasePort;
+import com.reto.usuario.domain.dto.EmployeeRestaurantClientRequestDto;
 import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.exceptions.UserNotFoundException;
+import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientPlazoleta;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.exceptions.EmailNotFoundException;
+import com.reto.usuario.domain.utils.TokenUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserUseCase implements IUserUseCasePort {
@@ -19,12 +22,14 @@ public class UserUseCase implements IUserUseCasePort {
     private final IUserPersistenceDomainPort userPersistenceDomainPort;
     private final IRolPersistenceDomainPort rolPersistenceDomainPort;
     private final PasswordEncoder passwordEncoder;
+    private final IEmployeeRestaurantClientPlazoleta employeeRestaurantClientPlazoleta;
 
     public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort, IRolPersistenceDomainPort rolesPersistenceDomainPort,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, IEmployeeRestaurantClientPlazoleta employeeRestaurantClientPlazoleta) {
         this.userPersistenceDomainPort = userPersistenceDomainPort;
         this.rolPersistenceDomainPort = rolesPersistenceDomainPort;
         this.passwordEncoder = passwordEncoder;
+        this.employeeRestaurantClientPlazoleta = employeeRestaurantClientPlazoleta;
     }
 
     @Override
@@ -37,11 +42,21 @@ public class UserUseCase implements IUserUseCasePort {
     }
 
     @Override
-    public void registerUserWithEmployeeRole(UserModel userModel) {
+    public void registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix) {
         restrictionsWhenSavingAUser(userModel);
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         userModel.setRol(findRoleByIdAndCompareRoleName("EMPLEADO", userModel.getRol().getIdRol()));
-        userPersistenceDomainPort.saveUser(userModel);
+
+        UserModel userOwner = userPersistenceDomainPort.findByEmail(TokenUtils.getUsername(tokenWithBearerPrefix));
+        if(userOwner == null) {
+            throw new UserNotFoundException("User not Found");
+        }
+        UserModel resultWhenSaveAnEmployeeUser = userPersistenceDomainPort.saveUser(userModel);
+        EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto();
+        employeeRestaurantRequestDto.setIdOwnerRestaurant(userOwner.getIdUser());
+        employeeRestaurantRequestDto.setEmployeeUserId(resultWhenSaveAnEmployeeUser.getIdUser());
+        employeeRestaurantClientPlazoleta.saveUserEmployeeToARestaurant(
+                                                        employeeRestaurantRequestDto, tokenWithBearerPrefix);
     }
 
     @Override
@@ -57,7 +72,7 @@ public class UserUseCase implements IUserUseCasePort {
         if(rolModel == null) {
             throw new RolNotFoundException("The rol not found");
         } else if(!rolModel.getName().equals(roleName) ) {
-            throw new RolNotFoundException("The rol is different from customer");
+            throw new RolNotFoundException("The rol is different to the requested");
         }
         return rolModel;
     }

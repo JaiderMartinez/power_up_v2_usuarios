@@ -1,5 +1,6 @@
 package com.reto.usuario.domain.usecase;
 
+import com.reto.usuario.domain.dto.EmployeeRestaurantClientRequestDto;
 import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
@@ -7,6 +8,7 @@ import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.exceptions.UserNotFoundException;
+import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientPlazoleta;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
@@ -20,7 +22,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 class UserUseCaseTest {
@@ -36,9 +41,14 @@ class UserUseCaseTest {
     @Mock
     PasswordEncoder passwordEncoder;
 
+    @Mock
+    IEmployeeRestaurantClientPlazoleta employeeRestaurantClientPlazoleta;
+
+    private final static String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LWVtcGxveWVlQGV4YW1wbGUuY29tIiwiaWF0IjoxNjgzODUxNTU2LCJleHAiOjE2ODY0NDM1NTYsImxhc3ROYW1lIjoic2RmIiwibmFtZSI6ImoiLCJyb2wiOlsiUk9MRV9FTVBMRUFETyJdfQ.Qv_taJuXcIa6Dt_xqqzQ8F1JAUfmuyeD4-uFWD-XT9c";
+
     @BeforeEach
     void setUp() {
-        userUseCase = new UserUseCase(userPersistenceDomainPort, rolPersistenceDomainPort, passwordEncoder);
+        userUseCase = new UserUseCase(userPersistenceDomainPort, rolPersistenceDomainPort, passwordEncoder, employeeRestaurantClientPlazoleta);
     }
 
     @Test
@@ -50,10 +60,14 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_registerUserWithEmployeeRole_withObjectAsUserOwner_whenSystemCreateAnOwnerAccount_ShouldReturnVoid() {
+    void test_registerUserWithEmployeeRole_withObjectAsUserOwnerAndTokenWithBearerPrefix_whenSystemCreateAnOwnerAccount_ShouldReturnVoid() {
         when(rolPersistenceDomainPort.findByIdRol(3L)).thenReturn(FactoryUserModelTest.rolModelEmployee());
-        when(userPersistenceDomainPort.saveUser(any())).thenReturn(FactoryUserModelTest.userModelWithEmployeeRole());
-        userUseCase.registerUserWithEmployeeRole(FactoryUserModelTest.userModelWithEmployeeRole());
+        when(userPersistenceDomainPort.findByEmail(FactoryUserModelTest.userModelWithEmployeeRole().getEmail()))
+                                                    .thenReturn(FactoryUserModelTest.userModelWithEmployeeRole());
+
+        when(userPersistenceDomainPort.saveUser(any(UserModel.class))).thenReturn(FactoryUserModelTest.userModelWithEmployeeRole());
+        doNothing().when(employeeRestaurantClientPlazoleta).saveUserEmployeeToARestaurant(any(EmployeeRestaurantClientRequestDto.class), any());
+        userUseCase.registerUserWithEmployeeRole(FactoryUserModelTest.userModelWithEmployeeRole(), token);
         verify(userPersistenceDomainPort, times(1)).saveUser(any(UserModel.class));
     }
 
@@ -96,10 +110,7 @@ class UserUseCaseTest {
     @Test
     void test_restrictionsWhenSavingAUser_withObjectUserModel_whenSystemRegisterUser_ShouldThrowEmailExistsException() {
         when(userPersistenceDomainPort.existsByEmail(FactoryUserModelTest.userModel().getEmail())).thenReturn(true);
-        assertThrows(
-                EmailExistsException.class,
-                () -> userUseCase.registerUserWithOwnerRole(FactoryUserModelTest.userModel())
-        );
+        assertThrows( EmailExistsException.class, () -> userUseCase.registerUserWithOwnerRole(FactoryUserModelTest.userModel()));
     }
 
     @Test
@@ -123,10 +134,10 @@ class UserUseCaseTest {
 
     @Test
     void test_findRoleByIdAndCompareRoleName_withStringAsRoleNameAndStringAsIdRol_whenSystemRegisterUser_ShouldThrowRolNotFoundException() {
-        when(rolPersistenceDomainPort.findByIdRol(3L)).thenReturn(FactoryUserModelTest.rolModelEmployee());
+        when(rolPersistenceDomainPort.findByIdRol(3L)).thenReturn(FactoryUserModelTest.rolModelCustomer());
         assertThrows(
                 RolNotFoundException.class,
-                () -> userUseCase.registerUserWithEmployeeRole(
+                () -> userUseCase.registerUserWithCustomerRole(
                         FactoryUserModelTest.userModelWithEmployeeRoleThatDoesNotExist())
         );
     }

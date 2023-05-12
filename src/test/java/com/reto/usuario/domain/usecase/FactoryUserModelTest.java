@@ -69,12 +69,13 @@ public class FactoryUserModelTest {
         RolModel rolModel = new RolModel();
         rolModel.setIdRol(3L);
         UserModel userModel = new UserModel();
+        userModel.setIdUser(3);
         userModel.setName("Luis");
         userModel.setLastName("Martinez");
         userModel.setPassword("12345678");
         userModel.setCellPhone("+574053986322");
         userModel.setIdentificationDocument(7388348534L);
-        userModel.setEmail("test-exception@gmail.com");
+        userModel.setEmail("test-employee@example.com");
         userModel.setRol(rolModel);
         return userModel;
     }

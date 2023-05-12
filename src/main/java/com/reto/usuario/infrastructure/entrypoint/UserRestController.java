@@ -12,12 +12,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,8 +43,7 @@ public class UserRestController {
     @PostMapping(value = "/")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> registerUserAsOwner(@Parameter(
-            description = "The user owner object to create",
-            required = true,
+            description = "The user owner object to create", required = true,
             schema = @Schema(implementation = UserRequestDto.class)) @RequestBody UserRequestDto userRequestDto) {
         userService.registerUserWithOwnerRole(userRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -60,8 +61,9 @@ public class UserRestController {
     })
     @PostMapping(value = "/employee")
     @PreAuthorize(value = "hasRole('PROPIETARIO')")
-    public ResponseEntity<Void> registerUserAsEmployee(@RequestBody UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto) {
-        userService.registerUserWithEmployeeRole(userRequestToCreateEmployeeDto);
+    public ResponseEntity<Void> registerUserAsEmployee(@RequestBody UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String tokenWithBearerPrefix) {
+        userService.registerUserWithEmployeeRole(userRequestToCreateEmployeeDto, tokenWithBearerPrefix);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -89,8 +91,7 @@ public class UserRestController {
     @GetMapping(value = "/verifier")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
     public ResponseEntity<UserResponseDto> userVerifierUserByToken(@Parameter(
-            description = "The id of the user to search for",
-            schema = @Schema(implementation = Long.class))
+            description = "The id of the user to search for", schema = @Schema(implementation = Long.class))
             @RequestParam(name = "idUser", required = false) Long idUser ) {
         if(idUser != null) {
             return new ResponseEntity<>(userService.getUserById(idUser), HttpStatus.OK);
