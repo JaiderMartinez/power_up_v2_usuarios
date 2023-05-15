@@ -7,6 +7,7 @@ import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
 import com.reto.usuario.application.handler.IUserService;
 import com.reto.usuario.application.mapper.request.IUserRequestMapper;
+import com.reto.usuario.application.mapper.response.IUserResponseMapper;
 import com.reto.usuario.domain.api.IUserUseCasePort;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
@@ -21,11 +22,11 @@ public class UserServiceImpl implements IUserService {
 
     private final IUserUseCasePort userUseCasePort;
     private final IUserRequestMapper userRequestMapper;
+    private final IUserResponseMapper UserResponseMapper;
 
     @Override
     public void registerUserWithOwnerRole(UserRequestDto userRequestDto) {
-        UserModel userModel = userRequestMapper.toUserModel(userRequestDto);
-        userUseCasePort.registerUserWithOwnerRole(userModel);
+        userUseCasePort.registerUserWithOwnerRole(userRequestMapper.toUserModel(userRequestDto));
     }
 
     @Override
@@ -60,13 +61,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserResponseDto getUserById(Long idUser) {
-        UserModel userModel = userUseCasePort.getUserById(idUser);
-        UserResponseDto userResponseDto = new UserResponseDto();
-        userResponseDto.setName(userModel.getName());
-        userResponseDto.setLastName(userModel.getLastName());
-        userResponseDto.setCellPhone(userModel.getCellPhone());
-        userResponseDto.setEmail(userModel.getEmail());
-        userResponseDto.setRol(userModel.getRol().getName());
-        return userResponseDto;
+        return UserResponseMapper.toUserResponseDto(userUseCasePort.getUserById(idUser));
     }
 }

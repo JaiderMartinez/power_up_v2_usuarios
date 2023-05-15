@@ -9,10 +9,11 @@ public enum ExceptionResponse {
     EMAIL_NOT_FOUND("Email not found"),
     USER_NOT_FOUND("User Not Found"),
     INVALID_CELL_PHONE_FORMAT("The cell phone format is wrong"),
-    ROL_NOT_FOUND("Rol Not Found or invalid role"),
-    AUTHENTICATION_FAILED("Failed login by token"),
+    ROL_NOT_FOUND("Role Not Found or invalid role"),
+    AUTHENTICATION_FAILED("Error token could not be read"),
     ROLE_IN_TOKEN_IS_INVALID("The user role is incorrect, please log in again"),
-    ACCESS_DENIED("Prohibited you do not have the necessary role for authorization");
+    TOKEN_INVALID("token not supported"),
+    ACCESS_DENIED("Access denied by insufficient permissions");
 
     private final String message;
 

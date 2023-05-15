@@ -70,7 +70,7 @@ public class ControllerAdvisor {
     public ResponseEntity<Map<String, String>> handleTokenInvalidException(
             TokenInvalidException ignoredTokenInvalidException) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.AUTHENTICATION_FAILED.getMessage()));
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.TOKEN_INVALID.getMessage()));
     }
 
     @ExceptionHandler(UserNotFoundException.class)

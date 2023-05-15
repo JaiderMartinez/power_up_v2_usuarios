@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserRestController {
 
     private final IUserService userService;
-    private final IAuthService authService;
 
     @Operation(summary = "Add a new user with rol owner")
     @ApiResponses(value = {
@@ -44,12 +43,10 @@ public class UserRestController {
     @PostMapping(value = "/")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> registerUserAsOwner(@Parameter(
-            description = "The user owner object to create",
-            required = true,
-            schema = @Schema(implementation = UserRequestDto.class))
-            @RequestBody UserRequestDto userRequestDto) {
+            description = "The user owner object to create", required = true,
+            schema = @Schema(implementation = UserRequestDto.class)) @RequestBody UserRequestDto userRequestDto) {
         userService.registerUserWithOwnerRole(userRequestDto);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(summary = "Add a new User with rol employee")
@@ -84,35 +81,20 @@ public class UserRestController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Login to get token")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Session started", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Bad credentials", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Email not found", content = @Content)
-    })
-    @PostMapping(value = "/login")
-    public ResponseEntity<String> login(@Parameter(
-            description = "The credentials of the user to login",
-            required = true,
-            schema = @Schema(implementation = AuthCredentialsRequest.class))
-            @RequestBody AuthCredentialsRequest authCredentialsRequest) {
-        return ResponseEntity.ok(authService.singIn(authCredentialsRequest));
-    }
-
     @Operation(summary = "token verification or get user by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Correct token", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Invalid Token", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Correct token and found user by id"),
+            @ApiResponse(responseCode = "204", description = "Correct token"),
+            @ApiResponse(responseCode = "401", description = "Invalid Token")
     })
     @GetMapping(value = "/verifier")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
-    public ResponseEntity<UserResponseDto> userVerifierByToken(@Parameter(
-            description = "The id of the user to search for",
-            schema = @Schema(implementation = Long.class))
-            @RequestParam(name = "iduser", required = false) Long idUser ) {
+    public ResponseEntity<UserResponseDto> userVerifierUserByToken(@Parameter(
+            description = "The id of the user to search for", schema = @Schema(implementation = Long.class))
+                                                                   @RequestParam(name = "idUser", required = false) Long idUser ) {
         if(idUser != null) {
             return new ResponseEntity<>(userService.getUserById(idUser), HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

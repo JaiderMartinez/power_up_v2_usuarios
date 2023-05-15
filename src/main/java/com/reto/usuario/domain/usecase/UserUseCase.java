@@ -11,24 +11,26 @@ import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.utils.PasswordEncoderUtils;
 import com.reto.usuario.domain.exceptions.EmailNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserUseCase implements IUserUseCasePort {
 
     private final IUserPersistenceDomainPort userPersistenceDomainPort;
     private final IRolPersistenceDomainPort rolPersistenceDomainPort;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort,
-                       IRolPersistenceDomainPort rolesPersistenceDomainPort) {
+    public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort, IRolPersistenceDomainPort rolesPersistenceDomainPort,
+                       PasswordEncoder passwordEncoder) {
         this.userPersistenceDomainPort = userPersistenceDomainPort;
         this.rolPersistenceDomainPort = rolesPersistenceDomainPort;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void registerUserWithOwnerRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         RolModel rol = rolPersistenceDomainPort.findByName("PROPIETARIO");
         userModel.setRol(rol);
         userPersistenceDomainPort.saveUser(userModel);
@@ -37,7 +39,7 @@ public class UserUseCase implements IUserUseCasePort {
     @Override
     public void registerUserWithEmployeeRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         userModel.setRol(findRoleByIdAndCompareRoleName("EMPLEADO", userModel.getRol().getIdRol()));
         userPersistenceDomainPort.saveUser(userModel);
     }
@@ -45,7 +47,7 @@ public class UserUseCase implements IUserUseCasePort {
     @Override
     public void registerUserWithCustomerRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         userModel.setRol(findRoleByIdAndCompareRoleName("CLIENTE", userModel.getRol().getIdRol()));
         userPersistenceDomainPort.saveUser(userModel);
     }

@@ -15,6 +15,8 @@ import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryM
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
 @Configuration
@@ -35,9 +37,13 @@ public class BeanConfiguration {
         return new RolPersistenceDomainPortImpl(rolRepositoryMysql, rolEntityMapper);
     }
 
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     public IUserUseCasePort userUseCasePort() {
-        return new UserUseCase(userPersistencePort(), rolesPersistencePort());
+        return new UserUseCase(userPersistencePort(), rolesPersistencePort(), passwordEncoder());
     }
 
     @Bean
