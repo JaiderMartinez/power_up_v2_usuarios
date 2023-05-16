@@ -3,10 +3,10 @@ package com.reto.usuario.infrastructure.entrypoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reto.usuario.application.dto.request.AuthCredentialsRequest;
 import com.reto.usuario.domain.utils.TokenUtils;
+import com.reto.usuario.infrastructure.drivenadapter.entity.RolEntity;
+import com.reto.usuario.infrastructure.drivenadapter.entity.UserEntity;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IRolRepositoryMysql;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
-import com.reto.usuario.infrastructure.entrypoint.factory.FactoryEntityAndRequest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,13 +38,27 @@ class AuthRestControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    private UserEntity userEntityOwner;
+
     @BeforeEach
     void setup() {
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityAdmin());
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityOwner());
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityEmployee());
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityCustomer());
-        userRepositoryMysql.save(FactoryEntityAndRequest.userOwner());
+        RolEntity rolEntityWithRoleAdmin = new RolEntity();
+        rolEntityWithRoleAdmin.setIdRol(1L);
+        rolEntityWithRoleAdmin.setDescription("In charge of creating dish and account with role employee");
+        rolEntityWithRoleAdmin.setName("PROPIETARIO");
+
+        userEntityOwner = new UserEntity();
+        userEntityOwner.setIdUser(1L);
+        userEntityOwner.setName("Name Owner");
+        userEntityOwner.setLastName("LastName Owner");
+        userEntityOwner.setIdentificationDocument(325235325L);
+        userEntityOwner.setCellPhone("5463679324");
+        userEntityOwner.setEmail("owner@owner.com");
+        userEntityOwner.setPassword("$2a$12$4o2roUXkPtsy5umeBGoLfuU2SWrRyLj4jZwFmYUgJCtMIPutO94ZO");
+        userEntityOwner.setRol(rolEntityWithRoleAdmin);
+
+        rolRepositoryMysql.save(rolEntityWithRoleAdmin);
+        userRepositoryMysql.save(userEntityOwner);
     }
 
     @Test
@@ -61,7 +76,9 @@ class AuthRestControllerTest {
         String token = resultAuth.getResponse().getContentAsString();
         token = token.substring(token.indexOf(':') + 2, token.length() - 1);
         UsernamePasswordAuthenticationToken authenticationToken = TokenUtils.getAuthentication(token);
-        Assertions.assertEquals(authCredentialsRequest.getEmail(), authenticationToken.getName());
+        assertEquals(authCredentialsRequest.getEmail(), authenticationToken.getName());
+        assertEquals(userEntityOwner.getRol().getName(), authenticationToken.getAuthorities().toString()
+                                                        .replace("[ROLE_","").replace("]", ""));
     }
 
     @Test

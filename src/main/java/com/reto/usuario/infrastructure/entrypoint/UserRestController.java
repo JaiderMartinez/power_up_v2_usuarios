@@ -1,11 +1,8 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
-import com.reto.usuario.application.dto.request.AuthCredentialsRequest;
-import com.reto.usuario.application.dto.request.CustomerRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
-import com.reto.usuario.application.handler.IAuthService;
 import com.reto.usuario.application.handler.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -63,21 +60,6 @@ public class UserRestController {
     @PreAuthorize(value = "hasRole('PROPIETARIO')")
     public ResponseEntity<Void> registerUserAsEmployee(@RequestBody UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto) {
         userService.registerUserWithEmployeeRole(userRequestToCreateEmployeeDto);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @Operation(summary = "Add a new User with rol customer")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User employee created", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Wrong email structure", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Fields cannot be empty", content = @Content),
-            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Rol Not Found or role other than customer", content = @Content),
-            @ApiResponse(responseCode = "409", description = "The email already exists", content = @Content)
-    })
-    @PostMapping(value = "/customer")
-    public ResponseEntity<Void> registerUserAsCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
-        userService.registerUserWithCustomerRole(customerRequestDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -44,14 +44,6 @@ public class UserUseCase implements IUserUseCasePort {
         userPersistenceDomainPort.saveUser(userModel);
     }
 
-    @Override
-    public void registerUserWithCustomerRole(UserModel userModel) {
-        restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
-        userModel.setRol(findRoleByIdAndCompareRoleName("CLIENTE", userModel.getRol().getIdRol()));
-        userPersistenceDomainPort.saveUser(userModel);
-    }
-
     private RolModel findRoleByIdAndCompareRoleName(String roleName, Long idRol) {
         RolModel rolModel = rolPersistenceDomainPort.findByIdRol(idRol);
         if(rolModel == null) {

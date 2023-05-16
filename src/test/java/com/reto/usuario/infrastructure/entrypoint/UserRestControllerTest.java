@@ -1,10 +1,12 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
+import com.reto.usuario.infrastructure.drivenadapter.entity.RolEntity;
+import com.reto.usuario.infrastructure.drivenadapter.entity.UserEntity;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IRolRepositoryMysql;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
-import com.reto.usuario.infrastructure.entrypoint.factory.FactoryEntityAndRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,23 +38,40 @@ class UserRestControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    private UserEntity userEntityAdmin;
+
     @BeforeEach
     void setup() {
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityAdmin());
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityOwner());
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityEmployee());
-        rolRepositoryMysql.save(FactoryEntityAndRequest.roleEntityCustomer());
+        RolEntity rolAdmin = new RolEntity(1L, "ADMINISTRADOR", "");
+        rolRepositoryMysql.save(rolAdmin);
+        rolRepositoryMysql.save(new RolEntity(2L, "PROPIETARIO", ""));
 
-        userRepositoryMysql.save(FactoryEntityAndRequest.userAdmin());
-        userRepositoryMysql.save(FactoryEntityAndRequest.userOwner());
+        userEntityAdmin = new UserEntity();
+        userEntityAdmin.setName("Name Admin");
+        userEntityAdmin.setLastName("LastName Admin");
+        userEntityAdmin.setCellPhone("5463679324");
+        userEntityAdmin.setEmail("admin@admin.com");
+        userEntityAdmin.setIdentificationDocument(325235325L);
+        userEntityAdmin.setPassword("$2a$12$4o2roUXkPtsy5umeBGoLfuU2SWrRyLj4jZwFmYUgJCtMIPutO94ZO");
+        userEntityAdmin.setRol(rolAdmin);
+
+        userRepositoryMysql.save(userEntityAdmin);
     }
 
     @WithMockUser(username = "admin@admin.com", password = "123", roles = {"ADMINISTRADOR"})
     @Test
     void test_registerUserAsOwner_withObjectUserRequestToCreateEmployeeDto_whenSystemCreateAccountWithOwnerRole_ShouldStatusCreated() throws Exception {
+        UserRequestDto userOwner = new UserRequestDto();
+        userOwner.setName("Owner");
+        userOwner.setLastName("LastName");
+        userOwner.setCellPhone("3125678902");
+        userOwner.setIdentificationDocument(353534292L);
+        userOwner.setEmail("new-owner@owner.com");
+        userOwner.setPassword("123");
+
         mockMvc.perform(post("/user-micro/user/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(FactoryEntityAndRequest.objectUserOwnerRequest())))
+                        .content(objectMapper.writeValueAsString(userOwner)))
                 .andExpect(status().isCreated());
     }
 
@@ -60,14 +79,14 @@ class UserRestControllerTest {
     @Test
     void test_userVerifierUserByToken_withLongIdUser_whenSystemFindUserById_ShouldTheUserWithIdOne() throws Exception {
         UserResponseDto userResponseDto = new UserResponseDto();
-        userResponseDto.setName(FactoryEntityAndRequest.userAdmin().getName());
-        userResponseDto.setLastName(FactoryEntityAndRequest.userAdmin().getLastName());
-        userResponseDto.setCellPhone(FactoryEntityAndRequest.userAdmin().getCellPhone());
-        userResponseDto.setEmail(FactoryEntityAndRequest.userAdmin().getEmail());
-        userResponseDto.setIdentificationDocument(FactoryEntityAndRequest.userAdmin().getIdentificationDocument());
-        userResponseDto.setRol(FactoryEntityAndRequest.userAdmin().getRol().getName());
+        userResponseDto.setName("Name Admin");
+        userResponseDto.setLastName("LastName Admin");
+        userResponseDto.setCellPhone("5463679324");
+        userResponseDto.setEmail("admin@admin.com");
+        userResponseDto.setIdentificationDocument(325235325L);
+        userResponseDto.setRol("ADMINISTRADOR");
 
-        MvcResult resultUserFound = mockMvc.perform(get("/user-micro/user/verifier?idUser=" + FactoryEntityAndRequest.userAdmin().getIdUser())
+        MvcResult resultUserFound = mockMvc.perform(get("/user-micro/user/verifier?idUser=" + userEntityAdmin.getIdUser())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();

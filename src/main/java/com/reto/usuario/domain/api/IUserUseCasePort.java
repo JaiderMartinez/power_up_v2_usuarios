@@ -8,8 +8,6 @@ public interface IUserUseCasePort {
 
     void registerUserWithEmployeeRole(UserModel userModel);
 
-    void registerUserWithCustomerRole(UserModel userModel);
-
     UserModel findUserByEmail(String email);
 
     UserModel getUserById(Long idUser);

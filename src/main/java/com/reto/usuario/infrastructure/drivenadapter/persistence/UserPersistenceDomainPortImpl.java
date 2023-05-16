@@ -5,7 +5,6 @@ import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
 
-
 public class UserPersistenceDomainPortImpl implements IUserPersistenceDomainPort {
 
     private final IUserRepositoryMysql userRepositoryMysql;

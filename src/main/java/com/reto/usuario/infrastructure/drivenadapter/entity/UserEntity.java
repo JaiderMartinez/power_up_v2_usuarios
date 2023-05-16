@@ -30,7 +30,7 @@ public class UserEntity {
     private String email;
     private String password;
     @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "id_rol")
+    @JoinColumn(name = "rolUser", referencedColumnName = "idRol")
     private RolEntity rol;
 }
 

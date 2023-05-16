@@ -1,6 +1,8 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.dto.AuthCredentials;
+import com.reto.usuario.domain.model.RolModel;
+import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.utils.TokenUtils;
 import org.junit.jupiter.api.Assertions;
@@ -31,16 +33,24 @@ class AuthUseCaseTest {
     @Test
     void test_signInUseCase_withAuthCredentials_whenSystemAuthenticatesTheUser_ShouldAToken() {
         AuthCredentials authCredentials = new AuthCredentials();
-        authCredentials.setEmail("test@gmail.com");
+        authCredentials.setEmail("owner@owner.com");
         authCredentials.setPassword("12345678");
 
-        when(userPersistenceDomainPort.findByEmail(authCredentials.getEmail())).thenReturn(
-                FactoryUserModelTest.userModel());
+        UserModel userExpected = new UserModel();
+        userExpected.setName("Luis");
+        userExpected.setLastName("Martinez");
+        userExpected.setPassword("12345678");
+        userExpected.setCellPhone("+574053986322");
+        userExpected.setIdentificationDocument(7388348534L);
+        userExpected.setEmail("owner@owner.com");
+        userExpected.setRol(new RolModel("PROPIETARIO", ""));
+
+        when(userPersistenceDomainPort.findByEmail(authCredentials.getEmail())).thenReturn(userExpected);
 
         String token = authUseCase.signInUseCase(authCredentials);
         assertNotNull(token);
         verify(userPersistenceDomainPort).findByEmail(authCredentials.getEmail());
         UsernamePasswordAuthenticationToken userAuth = TokenUtils.getAuthentication(token);
-        Assertions.assertEquals(FactoryUserModelTest.userModel().getEmail(), userAuth.getName());
+        Assertions.assertEquals(authCredentials.getEmail(), userAuth.getName());
     }
 }
