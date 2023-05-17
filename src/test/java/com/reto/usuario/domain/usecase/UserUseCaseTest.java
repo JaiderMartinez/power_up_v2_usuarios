@@ -45,7 +45,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_registerUserWithOwnerRole_withObjectAsUserModel_whenSystemCreateAnOwnerAccount_ShouldReturnVoid() {
+    void test_registerUserWithOwnerRole_withUserModel_ShouldRegisterUserWithOwnerRoleSuccess() {
         RolModel rolOwnerExpected = new RolModel();
         rolOwnerExpected.setIdRol(2L);
         rolOwnerExpected.setName("PROPIETARIO");
@@ -77,7 +77,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_findByEmail_withUsernameFromUser_whenSystemFindUserByEmail_ShouldReturnAnUser() {
+    void test_findByEmail_withStringAsEmailUniqueFromUserShouldReturnAnUser() {
         UserModel user = new UserModel();
         user.setName("Luis");
         user.setLastName("Martinez");
@@ -96,7 +96,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_validateUserFieldsEmpty_withObjectUserModel_whenSystemRegisterUser_ShouldThrowEmptyFieldsException() {
+    void test_validateUserFieldsEmpty_withObjectUserModel_ShouldThrowEmptyFieldsException() {
         RolModel rolModel = new RolModel();
         rolModel.setName("PROPIETARIO");
         rolModel.setDescription("");
@@ -117,7 +117,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_validateEmailStructure_withStringAsEmail_whenSystemRegisterUser_ShouldThrowInvalidEmailFormatException() {
+    void test_validateEmailStructure_withStringAsEmailUnique_ShouldThrowInvalidEmailFormatException() {
         UserModel userModelEmailStructureInvalid = new UserModel();
         userModelEmailStructureInvalid.setName("Luis");
         userModelEmailStructureInvalid.setLastName("Martinez");
@@ -134,7 +134,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_restrictionsWhenSavingAUser_withObjectUserModel_whenSystemRegisterUser_ShouldThrowEmailExistsException() {
+    void test_restrictionsWhenSavingAUser_withObjectAsUserModel_shouldThrowEmailExistsException() {
         UserModel userOwner = new UserModel();
         userOwner.setName("Luis");
         userOwner.setLastName("Martinez");
@@ -148,7 +148,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_findUserByEmail_withObjectUserModel_whenSystemRegisterUser_ShouldThrowEmailNotFoundException() {
+    void test_findUserByEmail_withObjectAsUserModel_ShouldThrowEmailNotFoundException() {
         assertThrows(
                 EmailNotFoundException.class,
                 () -> userUseCase.findUserByEmail("email-not-exist@gmail.com")
@@ -156,7 +156,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_validateUserFieldsEmpty_withObjectUserModel_whenSystemRegisterUser_ShouldThrowInvalidCellPhoneFormatException() {
+    void test_validateUserFieldsEmpty_withObjectAsUserModel_ShouldThrowInvalidCellPhoneFormatException() {
         UserModel userWithCellPhoneInvalid = new UserModel();
         userWithCellPhoneInvalid.setName("Luis");
         userWithCellPhoneInvalid.setLastName("Martinez");
@@ -172,7 +172,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_findRoleByIdAndCompareRoleName_withStringAsRoleNameAndStringAsIdRol_whenSystemRegisterUser_ShouldThrowRolNotFoundException() {
+    void test_findRoleByIdAndCompareRoleName_withStringAsRoleNameAndLongAsIdRol_ShouldThrowRolNotFoundException() {
         RolModel rolModel = new RolModel();
         rolModel.setIdRol(3L);
         UserModel userWithEmployeeRoleThatDoesNotExist = new UserModel();
@@ -192,7 +192,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_getUserById_withLongAsIdUser_whenSystemFindUserById_ShouldReturnAnUser() {
+    void test_getUserById_withLongAsIdUser_ShouldReturnAnUser() {
         UserModel userExpected = new UserModel();
         userExpected.setIdUser(1L);
         userExpected.setName("Luis");
@@ -214,7 +214,7 @@ class UserUseCaseTest {
     }
 
     @Test
-    void test_getUserById_withLongAsIdUser_whenSystemFindUserById_ShouldThrowUserNotFoundException() {
+    void test_getUserById_withLongAsIdUser_ShouldThrowUserNotFoundException() {
         when(userPersistenceDomainPort.findById(1L)).thenReturn(null);
         assertThrows(
                 UserNotFoundException.class,

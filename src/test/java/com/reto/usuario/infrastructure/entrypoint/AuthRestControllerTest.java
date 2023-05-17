@@ -62,7 +62,7 @@ class AuthRestControllerTest {
     }
 
     @Test
-    void test_login_withAuthCredentialsRequest_whenSystemAuthenticatesTheUserCustomer_ShouldAToken() throws Exception {
+    void test_login_withAuthCredentialsRequest_ShouldResponseAToken() throws Exception {
 
         AuthCredentialsRequest authCredentialsRequest = new AuthCredentialsRequest();
         authCredentialsRequest.setEmail("owner@owner.com");
@@ -82,7 +82,7 @@ class AuthRestControllerTest {
     }
 
     @Test
-    void test_login_withAuthCredentialsRequest_whenSystemAuthenticatesTheUser_ShouldAStatus401() throws Exception {
+    void test_login_withInvalidAuthCredentialsRequest_ShouldThrowUnauthorizedException() throws Exception {
         AuthCredentialsRequest incorrectAuthCredentialsRequest = new AuthCredentialsRequest();
 
         mockMvc.perform(post("/user-micro/auth/login")

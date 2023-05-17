@@ -60,7 +60,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = "admin@admin.com", password = "123", roles = {"ADMINISTRADOR"})
     @Test
-    void test_registerUserAsOwner_withObjectUserRequestToCreateEmployeeDto_whenSystemCreateAccountWithOwnerRole_ShouldStatusCreated() throws Exception {
+    void test_registerUserAsOwner_withObjectUserRequest_ShouldResponseRegisterUserAsOwnerSuccess() throws Exception {
         UserRequestDto userOwner = new UserRequestDto();
         userOwner.setName("Owner");
         userOwner.setLastName("LastName");
@@ -77,7 +77,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = "owner@owner.com", password = "123", roles = {"PROPIETARIO"})
     @Test
-    void test_userVerifierUserByToken_withLongIdUser_whenSystemFindUserById_ShouldTheUserWithIdOne() throws Exception {
+    void test_userVerifierUserByToken_withValidTokenForUserOne_ShouldReturnUserFoundWithIdOne() throws Exception {
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setName("Name Admin");
         userResponseDto.setLastName("LastName Admin");

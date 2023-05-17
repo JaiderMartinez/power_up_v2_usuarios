@@ -31,7 +31,7 @@ class AuthUseCaseTest {
     }
 
     @Test
-    void test_signInUseCase_withAuthCredentials_whenSystemAuthenticatesTheUser_ShouldAToken() {
+    void test_signInUseCase_withAuthCredentials_ShouldResponseAStringAsToken() {
         AuthCredentials authCredentials = new AuthCredentials();
         authCredentials.setEmail("owner@owner.com");
         authCredentials.setPassword("12345678");
