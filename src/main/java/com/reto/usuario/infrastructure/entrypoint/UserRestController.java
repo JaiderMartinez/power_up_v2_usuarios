@@ -2,6 +2,7 @@ package com.reto.usuario.infrastructure.entrypoint;
 
 import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
+import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
 import com.reto.usuario.application.handler.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,15 +38,14 @@ public class UserRestController {
             @ApiResponse(responseCode = "403", description = "The user does not have the admin role", content = @Content),
             @ApiResponse(responseCode = "409", description = "The email already exists", content = @Content)
     })
-    @PostMapping(value = "/")
+    @PostMapping(value = "/owner")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR')")
-    public ResponseEntity<Void> registerUserAsOwner(@Parameter(
+    public ResponseEntity<UserOwnerResponseDto> registerUserAsOwner(@Parameter(
             description = "The user owner object to create",
             required = true,
             schema = @Schema(implementation = UserRequestDto.class))
             @RequestBody UserRequestDto userRequestDto) {
-        userService.registerUserWithOwnerRole(userRequestDto);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(userService.registerUserWithOwnerRole(userRequestDto), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Add a new User with rol employee")

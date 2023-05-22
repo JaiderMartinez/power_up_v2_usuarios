@@ -2,6 +2,7 @@ package com.reto.usuario.application.handler.implementation;
 
 import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
+import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
 import com.reto.usuario.application.handler.IUserService;
 import com.reto.usuario.application.mapper.request.IUserRequestMapper;
@@ -21,8 +22,9 @@ public class UserServiceImpl implements IUserService {
     private final IUserResponseMapper userResponseMapper;
 
     @Override
-    public void registerUserWithOwnerRole(UserRequestDto userRequestDto) {
-        userUseCasePort.registerUserWithOwnerRole(userRequestMapper.toUserModel(userRequestDto));
+    public UserOwnerResponseDto registerUserWithOwnerRole(UserRequestDto userRequestDto) {
+        return userResponseMapper.toUserOwnerResponseDto(userUseCasePort.registerUserWithOwnerRole(
+                userRequestMapper.toUserModel(userRequestDto)));
     }
 
     @Override

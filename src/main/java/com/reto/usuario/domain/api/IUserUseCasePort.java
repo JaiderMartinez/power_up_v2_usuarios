@@ -4,7 +4,7 @@ import com.reto.usuario.domain.model.UserModel;
 
 public interface IUserUseCasePort {
 
-    void registerUserWithOwnerRole(UserModel userModel);
+    UserModel registerUserWithOwnerRole(UserModel userModel);
 
     void registerUserWithEmployeeRole(UserModel userModel);
 
