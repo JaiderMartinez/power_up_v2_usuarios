@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,8 +28,8 @@ public class UserEntity {
     private String cellPhone;
     private String email;
     private String password;
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "id_rol")
+    @ManyToOne
+    @JoinColumn(name = "id_rol", referencedColumnName = "idRol")
     private RolEntity rol;
 }
 

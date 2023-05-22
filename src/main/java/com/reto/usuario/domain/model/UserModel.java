@@ -2,7 +2,7 @@ package com.reto.usuario.domain.model;
 
 public class UserModel {
 
-    private long idUser;
+    private Long idUser;
     private String name;
     private String lastName;
     private Long identificationDocument;
@@ -13,7 +13,7 @@ public class UserModel {
 
     public UserModel(){}
 
-    public UserModel(String name, String lastName, Long identificationDocument, String cellPhone, String email, String password, com.reto.usuario.domain.model.RolModel rol) {
+    public UserModel(String name, String lastName, Long identificationDocument, String cellPhone, String email, String password, RolModel rol) {
         this.name = name;
         this.lastName = lastName;
         this.identificationDocument = identificationDocument;
@@ -23,11 +23,11 @@ public class UserModel {
         this.rol = rol;
     }
 
-    public long getIdUser() {
+    public Long getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(long idUser) {
+    public void setIdUser(Long idUser) {
         this.idUser = idUser;
     }
 

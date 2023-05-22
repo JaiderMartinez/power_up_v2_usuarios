@@ -2,7 +2,7 @@ package com.reto.usuario.domain.model;
 
 public class RolModel {
 
-    private long idRol;
+    private Long idRol;
     private String name;
     private String description;
 
@@ -13,11 +13,11 @@ public class RolModel {
         this.description = description;
     }
 
-    public long getIdRol() {
+    public Long getIdRol() {
         return idRol;
     }
 
-    public void setIdRol(long idRol) {
+    public void setIdRol(Long idRol) {
         this.idRol = idRol;
     }
 

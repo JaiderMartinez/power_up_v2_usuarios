@@ -6,27 +6,31 @@ import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
+import com.reto.usuario.domain.exceptions.UserNotFoundException;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.utils.PasswordEncoderUtils;
+import com.reto.usuario.domain.exceptions.EmailNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserUseCase implements IUserUseCasePort {
 
     private final IUserPersistenceDomainPort userPersistenceDomainPort;
     private final IRolPersistenceDomainPort rolPersistenceDomainPort;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort,
-                       IRolPersistenceDomainPort rolesPersistenceDomainPort) {
+    public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort, IRolPersistenceDomainPort rolesPersistenceDomainPort,
+                       PasswordEncoder passwordEncoder) {
         this.userPersistenceDomainPort = userPersistenceDomainPort;
         this.rolPersistenceDomainPort = rolesPersistenceDomainPort;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void registerUserWithOwnerRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         RolModel rol = rolPersistenceDomainPort.findByName("PROPIETARIO");
         userModel.setRol(rol);
         userPersistenceDomainPort.saveUser(userModel);
@@ -35,15 +39,19 @@ public class UserUseCase implements IUserUseCasePort {
     @Override
     public void registerUserWithEmployeeRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(PasswordEncoderUtils.passwordEncoder().encode(userModel.getPassword()));
-        RolModel rolModel = rolPersistenceDomainPort.findByIdRol(userModel.getRol().getIdRol());
+        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
+        userModel.setRol(findRoleByIdAndCompareRoleName("EMPLEADO", userModel.getRol().getIdRol()));
+        userPersistenceDomainPort.saveUser(userModel);
+    }
+
+    private RolModel findRoleByIdAndCompareRoleName(String roleName, Long idRol) {
+        RolModel rolModel = rolPersistenceDomainPort.findByIdRol(idRol);
         if(rolModel == null) {
             throw new RolNotFoundException("The rol not found");
-        } else if(!rolModel.getName().equals("EMPLEADO") ) {
-            throw new RolNotFoundException("The rol is different from employee");
+        } else if(!rolModel.getName().equals(roleName) ) {
+            throw new RolNotFoundException("The rol is different to the requested");
         }
-        userModel.setRol(rolModel);
-        userPersistenceDomainPort.saveUser(userModel);
+        return rolModel;
     }
 
     private void restrictionsWhenSavingAUser(UserModel userModel) {
@@ -90,6 +98,20 @@ public class UserUseCase implements IUserUseCasePort {
 
     @Override
     public UserModel findUserByEmail(String email) {
-        return userPersistenceDomainPort.findByEmail(email);
+        UserModel userModel = userPersistenceDomainPort.findByEmail(email);
+        if (userModel == null) {
+            throw new EmailNotFoundException("Email not found");
+        }
+        return userModel;
+    }
+
+    @Override
+    public UserModel getUserById(Long idUser) {
+        UserModel userModel = userPersistenceDomainPort.findById(idUser);
+        if(userModel == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        return userModel;
     }
 }
+

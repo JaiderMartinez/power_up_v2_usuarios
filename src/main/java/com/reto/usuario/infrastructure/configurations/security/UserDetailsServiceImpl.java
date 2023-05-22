@@ -29,9 +29,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     public boolean isValidateRoles(String email, String rol) {
         UserModel userModel = userUseCasePort.findUserByEmail(email);
-        if(userModel.getRol().getName().equals(rol)) {
-            return true;
-        }
-        return false;
+        return userModel.getRol().getName().equals(rol);
     }
 }

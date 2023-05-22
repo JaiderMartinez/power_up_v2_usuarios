@@ -1,6 +1,7 @@
 package com.reto.usuario.application.handler.implementation;
 
 import com.reto.usuario.application.dto.request.AuthCredentialsRequest;
+import com.reto.usuario.application.dto.response.TokenResponseDto;
 import com.reto.usuario.application.handler.IAuthService;
 import com.reto.usuario.application.mapper.request.IAuthCredentialsRequestMapper;
 import com.reto.usuario.domain.api.IAuthUseCasePort;
@@ -21,7 +22,7 @@ public class AuthServiceImpl implements IAuthService {
     private final IAuthUseCasePort authUseCasePort;
 
     @Override
-    public String singIn(AuthCredentialsRequest authCredentialsRequest) {
+    public TokenResponseDto singIn(AuthCredentialsRequest authCredentialsRequest) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authCredentialsRequest.getEmail(), authCredentialsRequest.getPassword()));
@@ -29,7 +30,9 @@ public class AuthServiceImpl implements IAuthService {
         } catch (AuthenticationException e) {
             throw new AuthenticationCredentialsNotFoundException(e.getMessage());
         }
-        return authUseCasePort.signInUseCase(
-                authCredentialsRequestMapper.toAuthCredentials(authCredentialsRequest));
+        TokenResponseDto tokenResponseDto = new TokenResponseDto();
+        tokenResponseDto.setAccessToken(authUseCasePort.signInUseCase(
+                authCredentialsRequestMapper.toAuthCredentials(authCredentialsRequest)));
+        return tokenResponseDto;
     }
 }
