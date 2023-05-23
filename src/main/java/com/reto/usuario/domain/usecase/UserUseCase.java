@@ -44,6 +44,11 @@ public class UserUseCase implements IUserUseCasePort {
         userPersistenceDomainPort.saveUser(userModel);
     }
 
+    @Override
+    public void registerUserWithCustomerRole(UserModel userModel) {
+       
+    }
+
     private RolModel findRoleByIdAndCompareRoleName(String roleName, Long idRol) {
         RolModel rolModel = rolPersistenceDomainPort.findByIdRol(idRol);
         if(rolModel == null) {
