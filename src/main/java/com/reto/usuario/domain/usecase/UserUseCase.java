@@ -31,8 +31,8 @@ public class UserUseCase implements IUserUseCasePort {
     public UserModel registerUserWithOwnerRole(UserModel userModel) {
         restrictionsWhenSavingAUser(userModel);
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
-        RolModel rol = rolPersistenceDomainPort.findByName("PROPIETARIO");
-        userModel.setRol(rol);
+        RolModel rolFound = rolPersistenceDomainPort.findByName("PROPIETARIO");
+        userModel.setRol(rolFound);
         return userPersistenceDomainPort.saveUser(userModel);
     }
 

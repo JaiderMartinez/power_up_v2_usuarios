@@ -8,6 +8,7 @@ import com.reto.usuario.application.handler.IUserService;
 import com.reto.usuario.application.mapper.request.IUserRequestMapper;
 import com.reto.usuario.application.mapper.response.IUserResponseMapper;
 import com.reto.usuario.domain.api.IUserUseCasePort;
+import com.reto.usuario.domain.model.UserModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +24,9 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserOwnerResponseDto registerUserWithOwnerRole(UserRequestDto userRequestDto) {
-        return userResponseMapper.toUserOwnerResponseDto(userUseCasePort.registerUserWithOwnerRole(
-                userRequestMapper.toUserModel(userRequestDto)));
+        final UserModel userRequestModel = this.userRequestMapper.toUserModel(userRequestDto);
+        final UserModel userRegisteredModel = this.userUseCasePort.registerUserWithOwnerRole(userRequestModel );
+        return this.userResponseMapper.toUserOwnerResponseDto(userRegisteredModel );
     }
 
     @Override

@@ -45,7 +45,8 @@ public class UserRestController {
             required = true,
             schema = @Schema(implementation = UserRequestDto.class))
             @RequestBody UserRequestDto userRequestDto) {
-            return new ResponseEntity<>(userService.registerUserWithOwnerRole(userRequestDto), HttpStatus.CREATED);
+        UserOwnerResponseDto userOwnerRegistered = userService.registerUserWithOwnerRole(userRequestDto);
+        return new ResponseEntity<>(userOwnerRegistered, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Add a new User with rol employee")
