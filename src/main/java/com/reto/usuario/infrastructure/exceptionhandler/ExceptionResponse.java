@@ -13,7 +13,8 @@ public enum ExceptionResponse {
     AUTHENTICATION_FAILED("Error token could not be read"),
     ROLE_IN_TOKEN_IS_INVALID("The user role is incorrect, please log in again"),
     TOKEN_INVALID("token not supported"),
-    ACCESS_DENIED("Access denied by insufficient permissions");
+    ACCESS_DENIED("Access denied by insufficient permissions"),
+    CONNECTION_REFUSED("Connection refused: connect");
 
     private final String message;
 
