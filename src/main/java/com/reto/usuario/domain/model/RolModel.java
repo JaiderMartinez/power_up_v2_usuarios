@@ -8,7 +8,8 @@ public class RolModel {
 
     public RolModel() {}
 
-    public RolModel(String name, String description) {
+    public RolModel(Long idRol, String name, String description) {
+        this.idRol = idRol;
         this.name = name;
         this.description = description;
     }

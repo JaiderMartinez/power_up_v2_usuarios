@@ -61,6 +61,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "401", description = "Username or role in the token is invalid"),
             @ApiResponse(responseCode = "403", description = "The user does not have the owner role"),
             @ApiResponse(responseCode = "404", description = "Rol not found or role other than employee"),
+            @ApiResponse(responseCode = "404", description = "The user is not a restaurant owner"),
             @ApiResponse(responseCode = "404", description = "Owner user not found"),
             @ApiResponse(responseCode = "409", description = "The email already exists"),
             @ApiResponse(responseCode = "502", description = "Connection refused: connect")

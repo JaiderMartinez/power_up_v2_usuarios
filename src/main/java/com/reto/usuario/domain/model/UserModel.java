@@ -13,7 +13,8 @@ public class UserModel {
 
     public UserModel(){}
 
-    public UserModel(String name, String lastName, Long identificationDocument, String cellPhone, String email, String password, RolModel rol) {
+    public UserModel(Long idUser, String name, String lastName, Long identificationDocument, String cellPhone, String email, String password, RolModel rol) {
+        this.idUser = idUser;
         this.name = name;
         this.lastName = lastName;
         this.identificationDocument = identificationDocument;

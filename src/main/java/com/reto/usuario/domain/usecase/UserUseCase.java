@@ -23,6 +23,7 @@ public class UserUseCase implements IUserUseCasePort {
     private final IRolPersistenceDomainPort rolPersistenceDomainPort;
     private final PasswordEncoder passwordEncoder;
     private final IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare;
+    private static final String ROLE_EMPLOYEE = "EMPLEADO";
 
     public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort, IRolPersistenceDomainPort rolesPersistenceDomainPort,
                        PasswordEncoder passwordEncoder, IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare) {
@@ -45,10 +46,10 @@ public class UserUseCase implements IUserUseCasePort {
     public UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix) {
         restrictionsWhenSavingAUser(userModel);
         userModel.setPassword(this.passwordEncoder.encode(userModel.getPassword()));
-        userModel.setRol(findRoleByIdAndCompareRoleName("EMPLEADO", userModel.getRol().getIdRol()));
-
+        final RolModel rolFound = findRoleByIdAndCompareRoleName(ROLE_EMPLOYEE, userModel.getRol().getIdRol());
+        userModel.setRol(rolFound);
+        final UserModel resultWhenSaveAnEmployeeUser = this.userPersistenceDomainPort.saveUser(userModel);
         final UserModel userOwnerRequestToCreateEmployee = this.userPersistenceDomainPort.findByEmail(TokenUtils.getUsername(tokenWithBearerPrefix));
-        UserModel resultWhenSaveAnEmployeeUser = this.userPersistenceDomainPort.saveUser(userModel);
         EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto(
                 userOwnerRequestToCreateEmployee.getIdUser(), resultWhenSaveAnEmployeeUser.getIdUser());
         this.employeeRestaurantClientSmallSquare.saveUserEmployeeToARestaurant(employeeRestaurantRequestDto, tokenWithBearerPrefix);

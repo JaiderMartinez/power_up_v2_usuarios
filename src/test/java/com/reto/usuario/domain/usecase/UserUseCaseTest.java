@@ -4,6 +4,8 @@ import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
+import com.reto.usuario.domain.exceptions.RolNotFoundException;
+import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
@@ -17,6 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,12 +41,17 @@ class UserUseCaseTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare;
+
+    private static final String TOKEN_WITH_BEARER_PREFIX = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvd25lckBvd25lci5jb20iLCJpYXQiOjE2ODUyMjQ2NTUsImV4cCI6MTY4NzgxNjY1NCwibGFzdE5hbWUiOiJmb3Jlcm8iLCJuYW1lIjoiam9oYW5hIiwicm9sIjpbIlJPTEVfUFJPUElFVEFSSU8iXX0.TbOPlE9wsW_HRlPfGnCZ8014cyTHHEvlTd38sa7P3tc";
+
     @Test
     void test_registerUserWithOwnerRole_withObjectAsUserModelWithoutFieldRole_shouldReturnUserModelWherePasswordThisEncryptedAndRoleOwner() {
         //Given
         RolModel rolExpected = new RolModel();
         rolExpected.setName("PROPIETARIO");
-        UserModel userExpected = new UserModel("Jose", "Martinez", 7388348534L,
+        UserModel userExpected = new UserModel(1L, "Jose", "Martinez", 7388348534L,
                 "+574053986322", "test-owner@owner.com", passwordEncoder.encode("123"), rolExpected);
         userExpected.setIdUser(1L);
         UserModel userActual = new UserModel();
@@ -134,6 +145,69 @@ class UserUseCaseTest {
         Assertions.assertThrows(
                 InvalidCellPhoneFormatException.class,
                 () -> userUseCase.registerUserWithOwnerRole(userModelWithCellPhoneInvalid)
+        );
+    }
+
+    @Test
+    void test_registerUserWithEmployeeRole_withAllFieldsValidInObjectAsUserModelAndTokenValid_shouldReturnUserEmployeeSaved() {
+        //Given
+        final UserModel userOwnerExpected = new UserModel(1L, "Owner", "Santiago", 38774375L, "3113986382", "owner@owner.com",
+                "123", new RolModel(2L, "PROPIETARIO", "owner restaurant"));
+        final RolModel rolEmployeeExpected = new RolModel(3L, "EMPLEADO", "employee restaurant");
+        final UserModel userEmployeeExpected = new UserModel(2L, "Jose", "Martinez", 7388348534L, "+574053986322",
+                "test-employee@employee.com", "123", rolEmployeeExpected);
+        RolModel rolRequest = new RolModel();
+        rolRequest.setIdRol(3L);
+        UserModel userEmployeeRequest = new UserModel();
+        userEmployeeRequest.setName("Jose");
+        userEmployeeRequest.setLastName("Martinez");
+        userEmployeeRequest.setIdentificationDocument(7388348534L);
+        userEmployeeRequest.setCellPhone("+574053986322");
+        userEmployeeRequest.setEmail("test-employee@employee.com");
+        userEmployeeRequest.setPassword("123");
+        userEmployeeRequest.setRol(rolRequest);
+
+        when(this.rolPersistenceDomainPort.findByIdRol(userEmployeeRequest.getRol().getIdRol())).thenReturn(rolEmployeeExpected);
+        when(this.userPersistenceDomainPort.findByEmail(userOwnerExpected.getEmail())).thenReturn(userOwnerExpected);
+        when(this.userPersistenceDomainPort.saveUser(userEmployeeRequest)).thenReturn(userEmployeeExpected);
+        doNothing().when(this.employeeRestaurantClientSmallSquare).saveUserEmployeeToARestaurant(
+                argThat(request -> request.getIdOwnerRestaurant().equals(userOwnerExpected.getIdUser()) &&
+                                   request.getEmployeeUserId().equals(userEmployeeExpected.getIdUser())),
+                eq(TOKEN_WITH_BEARER_PREFIX));
+        //When
+        final UserModel resultFromUserEmployeeSaved = this.userUseCase.registerUserWithEmployeeRole(userEmployeeRequest, TOKEN_WITH_BEARER_PREFIX);
+        //Then
+        verify(this.rolPersistenceDomainPort, times(1)).findByIdRol(userEmployeeRequest.getRol().getIdRol());
+        verify(this.userPersistenceDomainPort, times(1)).findByEmail(userOwnerExpected.getEmail());
+        verify(this.userPersistenceDomainPort, times(1)).saveUser(userEmployeeRequest);
+        assertEquals(userEmployeeExpected.getIdUser(), resultFromUserEmployeeSaved.getIdUser());
+        assertEquals(userEmployeeExpected.getName(), resultFromUserEmployeeSaved.getName());
+        assertEquals(userEmployeeExpected.getLastName(), resultFromUserEmployeeSaved.getLastName());
+        assertEquals(userEmployeeExpected.getIdentificationDocument(), resultFromUserEmployeeSaved.getIdentificationDocument());
+        assertEquals(userEmployeeExpected.getCellPhone(), resultFromUserEmployeeSaved.getCellPhone());
+        assertEquals(userEmployeeExpected.getEmail(), resultFromUserEmployeeSaved.getEmail());
+        assertEquals(userEmployeeExpected.getPassword(), resultFromUserEmployeeSaved.getPassword());
+        assertEquals(userEmployeeExpected.getRol().getName(), resultFromUserEmployeeSaved.getRol().getName());
+        assertEquals(userEmployeeExpected.getRol().getDescription(), resultFromUserEmployeeSaved.getRol().getDescription());
+    }
+
+    @Test
+    void test_registerUserWithEmployeeRole_withFieldIdRolIsDifferentToEmployeeAndTokenValid_shouldThrowRolNotFoundException() {
+        //Given
+        RolModel rolRequest = new RolModel();
+        rolRequest.setIdRol(3L);
+        UserModel userEmployeeRequest = new UserModel();
+        userEmployeeRequest.setName("Jose");
+        userEmployeeRequest.setLastName("Martinez");
+        userEmployeeRequest.setIdentificationDocument(7388348534L);
+        userEmployeeRequest.setCellPhone("+574053986322");
+        userEmployeeRequest.setEmail("test-employee@employee.com");
+        userEmployeeRequest.setPassword("123");
+        userEmployeeRequest.setRol(rolRequest);
+        //When & Then
+        Assertions.assertThrows(
+                RolNotFoundException.class,
+                () -> userUseCase.registerUserWithEmployeeRole(userEmployeeRequest, TOKEN_WITH_BEARER_PREFIX)
         );
     }
 }

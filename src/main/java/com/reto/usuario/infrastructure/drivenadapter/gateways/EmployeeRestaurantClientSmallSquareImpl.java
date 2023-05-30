@@ -32,6 +32,8 @@ public class EmployeeRestaurantClientSmallSquareImpl implements IEmployeeRestaur
                         return Mono.error(new TokenInvalidException("Username or role in the token is invalid"));
                     } else if(clientResponse.statusCode().equals(HttpStatus.FORBIDDEN)) {
                         return Mono.error(new AccessDeniedException("Access denied by insufficient permissions"));
+                    } else if(clientResponse.statusCode().equals(HttpStatus.NOT_FOUND)) {
+                        return Mono.error(new NullPointerException("You don't own any restaurant"));
                     } else {
                         return Mono.error(new SocketException("Unexpected error"));
                     }

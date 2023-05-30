@@ -108,4 +108,11 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CONNECTION_REFUSED.getMessage()));
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantNotExistsException(
+            NullPointerException notFoundRestaurant) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(MESSAGE, notFoundRestaurant.getMessage()));
+    }
 }
