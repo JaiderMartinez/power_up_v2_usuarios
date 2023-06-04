@@ -9,15 +9,17 @@ import com.reto.usuario.infrastructure.drivenadapter.entity.UserEntity;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IRolRepositoryMysql;
 import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
 import com.reto.usuario.infrastructure.exceptionhandler.ExceptionResponse;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserRestControllerTest {
 
     @Autowired
@@ -48,6 +51,9 @@ class UserRestControllerTest {
     @MockBean
     private IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private static final String USERNAME_ADMIN = "admin@dmin.com";
     private static final String USERNAME_OWNER = "owner-header-test@owner.com";
     private static final String PASSWORD = "123";
@@ -55,17 +61,18 @@ class UserRestControllerTest {
     private static final String ROLE_OWNER = "PROPIETARIO";
     private static final String USER_OWNER_API_PATH = "/user-micro/user/owner";
     private static final String USER_EMPLOYEE_API_PATH = "/user-micro/user/employee";
-    private static final String TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvd25lci1uZXdAb3duZXIuY29tIiwiaWF0IjoxNjg1NDA3ODMxLCJleHAiOjE2ODc5OTk4MzEsImxhc3ROYW1lIjoib3duZXIiLCJyb2wiOlsiUk9MRV9QUk9QSUVUQVJJTyJdfQ.ny5anG4cus7hwFRdnZNBbBGrlGIPEOnRpv66_u1ivs4";
+    private static final String TOKEN = "Bearer + token";
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    void initializeTestEnvironment() {
         rolRepositoryMysql.save(new RolEntity(1L, "PROPIETARIO", "Restaurant owner"));
         rolRepositoryMysql.save(new RolEntity(2L, "EMPLEADO", "Restaurant employee"));
     }
 
-    @AfterEach
+    @BeforeEach
     void cleaning() {
-        userRepositoryMysql.deleteAll();
+        this.userRepositoryMysql.deleteAll();
+        jdbcTemplate.execute("ALTER TABLE usuarios ALTER COLUMN id_user RESTART WITH 1");
     }
 
     @WithMockUser(username = USERNAME_ADMIN, password = PASSWORD, roles = {ROLE_ADMIN})
@@ -169,7 +176,7 @@ class UserRestControllerTest {
                 "+573154579374", "owner-new@owner.com", PASSWORD, new RolEntity(1L, ROLE_OWNER, "Restaurant owner")));
 
         UserRequestToCreateEmployeeDto userRequestToCreateEmployee = new UserRequestToCreateEmployeeDto("Jose", "Martinez", 193235345L, "3154579374",
-                                                                "employee@employee.com", PASSWORD, 2L);
+                                                                "employee@employee.com", PASSWORD, 2L, 1L);
         mockMvc.perform(post(USER_EMPLOYEE_API_PATH)
                         .header(HttpHeaders.AUTHORIZATION, TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -182,7 +189,7 @@ class UserRestControllerTest {
     @Test
     void test_registerUserAsEmployee_withFieldEmailInvalidStructureAndTokenValid_shouldReturnStatusBadRequest() throws Exception {
         UserRequestToCreateEmployeeDto userRequestToCreateEmployee = new UserRequestToCreateEmployeeDto("Jose", "Martinez", 193235345L, "3154579374",
-                "email-without-at-sign.employee.com", PASSWORD, 2L);
+                "email-without-at-sign.employee.com", PASSWORD, 2L, 1L);
 
         mockMvc.perform(post(USER_EMPLOYEE_API_PATH)
                         .header(HttpHeaders.AUTHORIZATION, TOKEN)
@@ -196,7 +203,7 @@ class UserRestControllerTest {
     @Test
     void test_registerUserAsEmployee_withAllFieldsEmptyExceptEmailInTheObjectAsUserRequestToCreateEmployeeDtoAndTokenValid_shouldReturnStatusBadRequest() throws Exception {
         UserRequestToCreateEmployeeDto userRequestToCreateEmployee = new UserRequestToCreateEmployeeDto("", "", null, "",
-                "employee-new@employee.com", null, null);
+                "employee-new@employee.com", null, null, 1L);
 
         mockMvc.perform(post(USER_EMPLOYEE_API_PATH)
                         .header(HttpHeaders.AUTHORIZATION, TOKEN)
@@ -210,7 +217,7 @@ class UserRestControllerTest {
     @Test
     void test_registerUserAsEmployee_withFieldCellPhoneFormatIsInvalidAndTokenValid_shouldReturnStatusBadRequest() throws Exception {
         UserRequestToCreateEmployeeDto userRequestToCreateEmployee = new UserRequestToCreateEmployeeDto("Jose", "Martinez", 193235345L,
-                "31597324error", "employee@employee.com", PASSWORD, 2L);
+                "31597324error", "employee@employee.com", PASSWORD, 2L, 1L);
 
         mockMvc.perform(post(USER_EMPLOYEE_API_PATH)
                         .header(HttpHeaders.AUTHORIZATION, TOKEN)
@@ -222,9 +229,9 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_OWNER, password = PASSWORD, roles = {ROLE_OWNER})
     @Test
-    void test_registerUserAsEmployee_withValueFromFieldIdRolNotExistsInTheDataBaseAndTokenValid_shouldReturnStatusNotFound() throws Exception {
+    void test_registerUserAsEmployee_withValueFromFieldIdRolNotExistsInTheDataBaseOrIsDifferentFromTheRoleEmployedAndTokenValid_shouldReturnStatusNotFound() throws Exception {
         UserRequestToCreateEmployeeDto userRequestToCreateEmployee = new UserRequestToCreateEmployeeDto("Jose", "Martinez", 193235345L,
-                "3159732432", "employee@employee.com", PASSWORD, 500L);
+                "3159732432", "employee@employee.com", PASSWORD, 500L, 1L);
 
         mockMvc.perform(post(USER_EMPLOYEE_API_PATH)
                         .header(HttpHeaders.AUTHORIZATION, TOKEN)
@@ -241,8 +248,7 @@ class UserRestControllerTest {
                 "+573154579374", USERNAME_OWNER, PASSWORD, new RolEntity(1L, ROLE_OWNER, "Restaurant owner")));
 
         UserRequestToCreateEmployeeDto userRequestToCreateEmployee = new UserRequestToCreateEmployeeDto("Jose", "Martinez", 193235345L,
-                "3159732432", USERNAME_OWNER, PASSWORD, 2L);
-
+                "3159732432", USERNAME_OWNER, PASSWORD, 2L, 1L);
         mockMvc.perform(post(USER_EMPLOYEE_API_PATH)
                         .header(HttpHeaders.AUTHORIZATION, TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)

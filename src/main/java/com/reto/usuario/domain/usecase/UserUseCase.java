@@ -14,7 +14,6 @@ import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.exceptions.EmailNotFoundException;
-import com.reto.usuario.domain.utils.TokenUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserUseCase implements IUserUseCasePort {
@@ -43,15 +42,13 @@ public class UserUseCase implements IUserUseCasePort {
     }
 
     @Override
-    public UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix) {
+    public UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix, Long idRestaurant) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(this.passwordEncoder.encode(userModel.getPassword()));
         final RolModel rolFound = findRoleByIdAndCompareRoleName(ROLE_EMPLOYEE, userModel.getRol().getIdRol());
+        userModel.setPassword(this.passwordEncoder.encode(userModel.getPassword()));
         userModel.setRol(rolFound);
         final UserModel resultWhenSaveAnEmployeeUser = this.userPersistenceDomainPort.saveUser(userModel);
-        final UserModel userOwnerRequestToCreateEmployee = this.userPersistenceDomainPort.findByEmail(TokenUtils.getUsername(tokenWithBearerPrefix));
-        EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto(
-                userOwnerRequestToCreateEmployee.getIdUser(), resultWhenSaveAnEmployeeUser.getIdUser());
+        EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto(resultWhenSaveAnEmployeeUser.getIdUser(), idRestaurant);
         this.employeeRestaurantClientSmallSquare.saveUserEmployeeToARestaurant(employeeRestaurantRequestDto, tokenWithBearerPrefix);
         return resultWhenSaveAnEmployeeUser;
     }

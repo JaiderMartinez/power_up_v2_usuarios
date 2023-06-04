@@ -44,7 +44,7 @@ class UserUseCaseTest {
     @Mock
     private IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare;
 
-    private static final String TOKEN_WITH_BEARER_PREFIX = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJvd25lckBvd25lci5jb20iLCJpYXQiOjE2ODUyMjQ2NTUsImV4cCI6MTY4NzgxNjY1NCwibGFzdE5hbWUiOiJmb3Jlcm8iLCJuYW1lIjoiam9oYW5hIiwicm9sIjpbIlJPTEVfUFJPUElFVEFSSU8iXX0.TbOPlE9wsW_HRlPfGnCZ8014cyTHHEvlTd38sa7P3tc";
+    private static final String TOKEN_WITH_BEARER_PREFIX = "Bearer + token";
 
     @Test
     void test_registerUserWithOwnerRole_withObjectAsUserModelWithoutFieldRole_shouldReturnUserModelWherePasswordThisEncryptedAndRoleOwner() {
@@ -151,8 +151,6 @@ class UserUseCaseTest {
     @Test
     void test_registerUserWithEmployeeRole_withAllFieldsValidInObjectAsUserModelAndTokenValid_shouldReturnUserEmployeeSaved() {
         //Given
-        final UserModel userOwnerExpected = new UserModel(1L, "Owner", "Santiago", 38774375L, "3113986382", "owner@owner.com",
-                "123", new RolModel(2L, "PROPIETARIO", "owner restaurant"));
         final RolModel rolEmployeeExpected = new RolModel(3L, "EMPLEADO", "employee restaurant");
         final UserModel userEmployeeExpected = new UserModel(2L, "Jose", "Martinez", 7388348534L, "+574053986322",
                 "test-employee@employee.com", "123", rolEmployeeExpected);
@@ -166,19 +164,18 @@ class UserUseCaseTest {
         userEmployeeRequest.setEmail("test-employee@employee.com");
         userEmployeeRequest.setPassword("123");
         userEmployeeRequest.setRol(rolRequest);
+        Long idRestaurant = 15L;
 
         when(this.rolPersistenceDomainPort.findByIdRol(userEmployeeRequest.getRol().getIdRol())).thenReturn(rolEmployeeExpected);
-        when(this.userPersistenceDomainPort.findByEmail(userOwnerExpected.getEmail())).thenReturn(userOwnerExpected);
         when(this.userPersistenceDomainPort.saveUser(userEmployeeRequest)).thenReturn(userEmployeeExpected);
         doNothing().when(this.employeeRestaurantClientSmallSquare).saveUserEmployeeToARestaurant(
-                argThat(request -> request.getIdOwnerRestaurant().equals(userOwnerExpected.getIdUser()) &&
-                                   request.getEmployeeUserId().equals(userEmployeeExpected.getIdUser())),
+                argThat(request -> request.getIdUserEmployee().equals(userEmployeeExpected.getIdUser()) &&
+                                   request.getIdRestaurant().equals(idRestaurant)),
                 eq(TOKEN_WITH_BEARER_PREFIX));
         //When
-        final UserModel resultFromUserEmployeeSaved = this.userUseCase.registerUserWithEmployeeRole(userEmployeeRequest, TOKEN_WITH_BEARER_PREFIX);
+        final UserModel resultFromUserEmployeeSaved = this.userUseCase.registerUserWithEmployeeRole(userEmployeeRequest, TOKEN_WITH_BEARER_PREFIX, idRestaurant);
         //Then
         verify(this.rolPersistenceDomainPort, times(1)).findByIdRol(userEmployeeRequest.getRol().getIdRol());
-        verify(this.userPersistenceDomainPort, times(1)).findByEmail(userOwnerExpected.getEmail());
         verify(this.userPersistenceDomainPort, times(1)).saveUser(userEmployeeRequest);
         assertEquals(userEmployeeExpected.getIdUser(), resultFromUserEmployeeSaved.getIdUser());
         assertEquals(userEmployeeExpected.getName(), resultFromUserEmployeeSaved.getName());
@@ -207,7 +204,7 @@ class UserUseCaseTest {
         //When & Then
         Assertions.assertThrows(
                 RolNotFoundException.class,
-                () -> userUseCase.registerUserWithEmployeeRole(userEmployeeRequest, TOKEN_WITH_BEARER_PREFIX)
+                () -> userUseCase.registerUserWithEmployeeRole(userEmployeeRequest, TOKEN_WITH_BEARER_PREFIX, 15L)
         );
     }
 }

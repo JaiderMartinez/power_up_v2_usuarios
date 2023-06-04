@@ -18,4 +18,5 @@ public class UserRequestToCreateEmployeeDto {
     private String email;
     private String password;
     private Long idRol;
+    private Long idRestaurant;
 }

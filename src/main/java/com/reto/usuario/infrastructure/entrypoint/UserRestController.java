@@ -5,6 +5,7 @@ import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
 import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
+import com.reto.usuario.application.dto.response.UserWithFieldIdUserResponseDto;
 import com.reto.usuario.application.handler.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -60,9 +61,8 @@ public class UserRestController {
             @ApiResponse(responseCode = "400", description = "The cell phone format is wrong"),
             @ApiResponse(responseCode = "401", description = "Username or role in the token is invalid"),
             @ApiResponse(responseCode = "403", description = "The user does not have the owner role"),
-            @ApiResponse(responseCode = "404", description = "Rol not found or role other than employee"),
-            @ApiResponse(responseCode = "404", description = "The user is not a restaurant owner"),
-            @ApiResponse(responseCode = "404", description = "Owner user not found"),
+            @ApiResponse(responseCode = "404", description = "The idRol not found or role other than employee"),
+            @ApiResponse(responseCode = "404", description = "The user does not have a restaurant"),
             @ApiResponse(responseCode = "409", description = "The email already exists"),
             @ApiResponse(responseCode = "502", description = "Connection refused: connect")
     })
@@ -92,5 +92,17 @@ public class UserRestController {
             return new ResponseEntity<>(userService.getUserById(idUser), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(summary = "search user by email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User found")
+    })
+    @GetMapping(value = "/get-user-by-email")
+    @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
+    public ResponseEntity<UserWithFieldIdUserResponseDto> searchUserByEmail(@Parameter(
+            description = "Email unique from user", schema = @Schema(implementation = String.class))
+            @RequestParam(name = "email") String email ) {
+        return new ResponseEntity<>(this.userService.getUserByUniqueEmail(email), HttpStatus.OK);
     }
 }

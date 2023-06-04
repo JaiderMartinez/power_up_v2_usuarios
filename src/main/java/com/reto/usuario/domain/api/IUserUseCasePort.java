@@ -6,7 +6,7 @@ public interface IUserUseCasePort {
 
     UserModel registerUserWithOwnerRole(UserModel userModel);
 
-    UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix);
+    UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix, Long idRestaurant);
 
     UserModel findUserByEmail(String email);
 

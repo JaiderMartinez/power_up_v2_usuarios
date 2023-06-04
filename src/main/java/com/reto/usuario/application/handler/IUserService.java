@@ -5,6 +5,7 @@ import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
 import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
+import com.reto.usuario.application.dto.response.UserWithFieldIdUserResponseDto;
 
 public interface IUserService {
 
@@ -13,4 +14,6 @@ public interface IUserService {
     UserEmployeeResponseDto registerUserWithEmployeeRole(UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto, String tokenWithPrefixBearer);
 
     UserResponseDto getUserById(Long idUser);
+
+    UserWithFieldIdUserResponseDto getUserByUniqueEmail(String email);
 }
