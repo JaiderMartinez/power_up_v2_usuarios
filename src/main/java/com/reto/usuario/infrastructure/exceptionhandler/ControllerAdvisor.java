@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.Map;
 
@@ -99,5 +100,19 @@ public class ControllerAdvisor {
             AccessDeniedException ignoredAccessDeniedException) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Collections.singletonMap(MESSAGE, ExceptionResponse.ACCESS_DENIED.getMessage()));
+    }
+
+    @ExceptionHandler(SocketException.class)
+    public ResponseEntity<Map<String, String>> handleSocketException(
+            SocketException ignoredSocketException) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Collections.singletonMap(MESSAGE, ExceptionResponse.CONNECTION_REFUSED.getMessage()));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Map<String, String>> handleRestaurantNotExistsException(
+            NullPointerException notFoundRestaurant) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Collections.singletonMap(MESSAGE, notFoundRestaurant.getMessage()));
     }
 }

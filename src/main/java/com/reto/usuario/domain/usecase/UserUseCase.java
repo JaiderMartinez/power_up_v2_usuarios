@@ -1,12 +1,14 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.api.IUserUseCasePort;
+import com.reto.usuario.domain.dto.EmployeeRestaurantClientRequestDto;
 import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.exceptions.UserNotFoundException;
+import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
@@ -19,12 +21,15 @@ public class UserUseCase implements IUserUseCasePort {
     private final IUserPersistenceDomainPort userPersistenceDomainPort;
     private final IRolPersistenceDomainPort rolPersistenceDomainPort;
     private final PasswordEncoder passwordEncoder;
+    private final IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare;
+    private static final String ROLE_EMPLOYEE = "EMPLEADO";
 
     public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort, IRolPersistenceDomainPort rolesPersistenceDomainPort,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare) {
         this.userPersistenceDomainPort = userPersistenceDomainPort;
         this.rolPersistenceDomainPort = rolesPersistenceDomainPort;
         this.passwordEncoder = passwordEncoder;
+        this.employeeRestaurantClientSmallSquare = employeeRestaurantClientSmallSquare;
     }
 
     @Override
@@ -37,11 +42,15 @@ public class UserUseCase implements IUserUseCasePort {
     }
 
     @Override
-    public void registerUserWithEmployeeRole(UserModel userModel) {
+    public UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix, Long idRestaurant) {
         restrictionsWhenSavingAUser(userModel);
-        userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
-        userModel.setRol(findRoleByIdAndCompareRoleName("EMPLEADO", userModel.getRol().getIdRol()));
-        userPersistenceDomainPort.saveUser(userModel);
+        final RolModel rolFound = findRoleByIdAndCompareRoleName(ROLE_EMPLOYEE, userModel.getRol().getIdRol());
+        userModel.setPassword(this.passwordEncoder.encode(userModel.getPassword()));
+        userModel.setRol(rolFound);
+        final UserModel resultWhenSaveAnEmployeeUser = this.userPersistenceDomainPort.saveUser(userModel);
+        EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto(resultWhenSaveAnEmployeeUser.getIdUser(), idRestaurant);
+        this.employeeRestaurantClientSmallSquare.saveUserEmployeeToARestaurant(employeeRestaurantRequestDto, tokenWithBearerPrefix);
+        return resultWhenSaveAnEmployeeUser;
     }
 
     private RolModel findRoleByIdAndCompareRoleName(String roleName, Long idRol) {
