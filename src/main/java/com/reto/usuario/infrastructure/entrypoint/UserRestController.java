@@ -53,7 +53,7 @@ public class UserRestController {
         return new ResponseEntity<>(userOwnerRegistered, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Add a new User with rol employee")
+    @Operation(summary = "Add a new user with rol employee")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User employee created"),
             @ApiResponse(responseCode = "400", description = "Wrong email structure"),

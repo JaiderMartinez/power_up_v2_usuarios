@@ -77,7 +77,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_ADMIN, password = PASSWORD, roles = {ROLE_ADMIN})
     @Test
-    void test_registerUserAsOwner_withCompleteUserRequestDto_shouldResponseSavedIdUserAndStatusCreated() throws Exception {
+    void test_registerUserAsOwner_withCompleteUserOwnerRequestDto_shouldResponseSavedIdUserAndStatusCreated() throws Exception {
         UserOwnerRequestDto userOwner = new UserOwnerRequestDto();
         userOwner.setName("Jose");
         userOwner.setLastName("Martinez");
@@ -95,7 +95,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_ADMIN, password = PASSWORD, roles = {ROLE_ADMIN})
     @Test
-    void test_registerUserAsOwner_withFieldEmailIsInvalidInUserRequestDto_shouldThrowStatusBadRequest() throws Exception {
+    void test_registerUserAsOwner_withFieldEmailIsInvalidInUserOwnerRequestDto_shouldThrowStatusBadRequest() throws Exception {
         UserOwnerRequestDto userOwner = new UserOwnerRequestDto();
         userOwner.setName("Jose");
         userOwner.setLastName("Martinez");
@@ -113,7 +113,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_ADMIN, password = PASSWORD, roles = {ROLE_ADMIN})
     @Test
-    void test_registerUserAsOwner_withFieldsEmptyInUserRequestDto_shouldThrowStatusBadRequest() throws Exception {
+    void test_registerUserAsOwner_withFieldsEmptyInUserOwnerRequestDto_shouldThrowStatusBadRequest() throws Exception {
         UserOwnerRequestDto userOwner = new UserOwnerRequestDto();
         userOwner.setName("");
         userOwner.setLastName("");
@@ -131,7 +131,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_ADMIN, password = PASSWORD, roles = {ROLE_ADMIN})
     @Test
-    void test_registerUserAsOwner_withInvalidCellPhoneInUserRequestDto_shouldThrowStatusBadRequest() throws Exception {
+    void test_registerUserAsOwner_withInvalidCellPhoneInUserOwnerRequestDto_shouldThrowStatusBadRequest() throws Exception {
         UserOwnerRequestDto userOwner = new UserOwnerRequestDto();
         userOwner.setName("Jose");
         userOwner.setLastName("Martinez");
@@ -150,7 +150,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_ADMIN, password = PASSWORD, roles = {ROLE_ADMIN})
     @Test
-    void test_registerUserAsOwner_withExistingEmailInUserRequestDto_shouldThrowStatusConflict() throws Exception {
+    void test_registerUserAsOwner_withExistingEmailInUserOwnerRequestDto_shouldThrowStatusConflict() throws Exception {
         userRepositoryMysql.save(new UserEntity(1L, "Jose", "Martinez", 12323435345L,
                 "3154579374", "owner@owner.com", PASSWORD, new RolEntity(1L, "PROPIETARIO", "Restaurant owner")));
 
@@ -171,7 +171,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_OWNER, password = PASSWORD, roles = {ROLE_OWNER})
     @Test
-    void test_registerUserAsEmployee_withAllFieldsCompleteUserRequestToCreateEmployeeDtoAndTokenValid_shouldResponseStatusCreatedAndValueFieldIdUserSavedInTheDataBase() throws Exception {
+    void test_registerUserAsEmployee_withAllFieldsCompleteUserEmployeeRequestDtoAndTokenValid_shouldResponseStatusCreatedAndValueFieldIdUserSavedInTheDataBase() throws Exception {
         this.userRepositoryMysql.save(new UserEntity(1L, "Jose", "Santiago", 1243545623L,
                 "+573154579374", "owner-new@owner.com", PASSWORD, new RolEntity(1L, ROLE_OWNER, "Restaurant owner")));
 
@@ -201,7 +201,7 @@ class UserRestControllerTest {
 
     @WithMockUser(username = USERNAME_OWNER, password = PASSWORD, roles = {ROLE_OWNER})
     @Test
-    void test_registerUserAsEmployee_withAllFieldsEmptyExceptEmailInTheObjectAsUserRequestToCreateEmployeeDtoAndTokenValid_shouldReturnStatusBadRequest() throws Exception {
+    void test_registerUserAsEmployee_withAllFieldsEmptyExceptEmailInTheObjectAsUserEmployeeRequestDtoAndTokenValid_shouldReturnStatusBadRequest() throws Exception {
         UserEmployeeRequestDto userRequestToCreateEmployee = new UserEmployeeRequestDto("", "", null, "",
                 "employee-new@employee.com", null, null, 1L);
 
