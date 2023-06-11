@@ -1,7 +1,7 @@
 package com.reto.usuario.infrastructure.configurations.security.authorization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.reto.usuario.domain.utils.TokenUtils;
+import com.reto.usuario.infrastructure.drivenadapter.utils.TokenUtils;
 import com.reto.usuario.infrastructure.configurations.security.UserDetailsServiceImpl;
 import com.reto.usuario.infrastructure.exceptionhandler.ExceptionResponse;
 import lombok.RequiredArgsConstructor;

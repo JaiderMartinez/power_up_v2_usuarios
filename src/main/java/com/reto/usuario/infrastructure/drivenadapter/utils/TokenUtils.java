@@ -1,4 +1,4 @@
-package com.reto.usuario.domain.utils;
+package com.reto.usuario.infrastructure.drivenadapter.utils;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -11,6 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -23,13 +24,16 @@ import java.util.stream.Collectors;
 
 public class TokenUtils {
 
-    private static final Long ACCESS_TOKEN_VALIDITY_SECONDS = 2_592_000L;
-    private static final String ACCESS_TOKEN_SECRET = "8y/B?E(G+KbPeShVmYq3t6w9z$C&F)J@";
+    @Value("${access.token.validity.seconds}")
+    private static Long accessTokenValiditySeconds;
+
+    @Value("${access.token.secret}")
+    private static String accessTokenSecret;
 
     private TokenUtils() {}
 
     public static String createToken(String email, List<String> rol, String name, String lastName) {
-        long expirationTime = ACCESS_TOKEN_VALIDITY_SECONDS * 1000;
+        long expirationTime = accessTokenValiditySeconds * 1000;
         Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
@@ -40,7 +44,7 @@ public class TokenUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(expirationDate)
                 .addClaims(extra)
-                .signWith(Keys.hmacShaKeyFor(ACCESS_TOKEN_SECRET.getBytes()), SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(accessTokenSecret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -58,24 +62,9 @@ public class TokenUtils {
         }
     }
 
-    public static String getUsername(String tokenWithBearerPrefix) {
-        try {
-            String username;
-            if (tokenWithBearerPrefix.startsWith("Bearer ")) {
-                tokenWithBearerPrefix = tokenWithBearerPrefix.replace("Bearer ", "");
-            }
-            JWT jwt = JWTParser.parse(tokenWithBearerPrefix);
-            JWTClaimsSet claims = jwt.getJWTClaimsSet();
-            username = claims.getSubject();
-            return username;
-        } catch (ParseException e) {
-            throw new AuthenticationFailedException("Error token could not be read");
-        }
-    }
-
     public static boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(ACCESS_TOKEN_SECRET.getBytes()).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(accessTokenSecret.getBytes()).build().parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException | UnsupportedJwtException
                  | ExpiredJwtException | IllegalArgumentException | SignatureException e) {

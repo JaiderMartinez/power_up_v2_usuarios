@@ -1,7 +1,7 @@
 package com.reto.usuario.application.handler.implementation;
 
-import com.reto.usuario.application.dto.request.UserRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
+import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
+import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
 import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
@@ -25,14 +25,14 @@ public class UserServiceImpl implements IUserService {
     private final IUserResponseMapper userResponseMapper;
 
     @Override
-    public UserOwnerResponseDto registerUserWithOwnerRole(UserRequestDto userRequestDto) {
+    public UserOwnerResponseDto registerUserWithOwnerRole(UserOwnerRequestDto userRequestDto) {
         final UserModel userRequestModel = this.userRequestMapper.toUserModel(userRequestDto);
         final UserModel userRegisteredModel = this.userUseCasePort.registerUserWithOwnerRole(userRequestModel );
         return this.userResponseMapper.toUserOwnerResponseDto(userRegisteredModel );
     }
 
     @Override
-    public UserEmployeeResponseDto registerUserWithEmployeeRole(UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto, String tokenWithPrefixBearer) {
+    public UserEmployeeResponseDto registerUserWithEmployeeRole(UserEmployeeRequestDto userRequestToCreateEmployeeDto, String tokenWithPrefixBearer) {
         final UserModel userEmployeeRequestModel = this.userRequestMapper.toUserModelEmployee(userRequestToCreateEmployeeDto);
         final UserModel userEmployeeRegisteredModel = this.userUseCasePort.registerUserWithEmployeeRole(userEmployeeRequestModel, tokenWithPrefixBearer, userRequestToCreateEmployeeDto.getIdRestaurant());
         return userResponseMapper.toUserEmployeeResponseDto(userEmployeeRegisteredModel);

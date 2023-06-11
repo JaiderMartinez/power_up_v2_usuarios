@@ -2,7 +2,7 @@ package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.dto.AuthCredentials;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.utils.TokenUtils;
+import com.reto.usuario.infrastructure.drivenadapter.utils.TokenUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

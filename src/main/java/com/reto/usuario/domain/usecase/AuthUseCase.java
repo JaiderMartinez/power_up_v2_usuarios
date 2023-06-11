@@ -4,7 +4,7 @@ import com.reto.usuario.domain.api.IAuthUseCasePort;
 import com.reto.usuario.domain.dto.AuthCredentials;
 import com.reto.usuario.domain.model.UserModel;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.utils.TokenUtils;
+import com.reto.usuario.infrastructure.drivenadapter.utils.TokenUtils;
 
 import java.util.ArrayList;
 import java.util.List;
