@@ -1,7 +1,7 @@
 package com.reto.usuario.infrastructure.configurations.security.authorization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.reto.usuario.infrastructure.drivenadapter.utils.TokenUtils;
+import com.reto.usuario.infrastructure.configurations.security.utils.TokenUtils;
 import com.reto.usuario.infrastructure.configurations.security.UserDetailsServiceImpl;
 import com.reto.usuario.infrastructure.exceptionhandler.ExceptionResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final TokenUtils tokenUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,7 +38,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().getAuthentication() == null) {
             String token = bearerToken.replace("Bearer ", "").trim();
 
-            if (!TokenUtils.validateToken(token)) {
+            if (!this.tokenUtils.validateToken(token)) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter().write(new ObjectMapper()
@@ -51,7 +52,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()).get(0).replace("ROLE_", "");
 
-            if( !userDetailsService.isValidateRoles(usernamePasswordAuthenticationToken.getName(), role)) {
+            if( !this.userDetailsService.isValidateRoles(usernamePasswordAuthenticationToken.getName(), role)) {
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.getWriter().write(new ObjectMapper()

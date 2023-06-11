@@ -1,4 +1,4 @@
-package com.reto.usuario.infrastructure.drivenadapter.utils;
+package com.reto.usuario.infrastructure.configurations.security.utils;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -14,6 +14,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -22,18 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Component
 public class TokenUtils {
 
     @Value("${access.token.validity.seconds}")
-    private static Long accessTokenValiditySeconds;
+    private Long accessTokenValiditySeconds;
 
     @Value("${access.token.secret}")
-    private static String accessTokenSecret;
+    private String accessTokenSecret;
 
-    private TokenUtils() {}
-
-    public static String createToken(String email, List<String> rol, String name, String lastName) {
-        long expirationTime = accessTokenValiditySeconds * 1000;
+    public String createToken(String email, List<String> rol, String name, String lastName) {
+        long expirationTime = this.accessTokenValiditySeconds * 1000;
         Date expirationDate = new Date(System.currentTimeMillis() + expirationTime);
         Map<String, Object> extra = new HashMap<>();
         extra.put("name", name);
@@ -44,7 +44,7 @@ public class TokenUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(expirationDate)
                 .addClaims(extra)
-                .signWith(Keys.hmacShaKeyFor(accessTokenSecret.getBytes()), SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(this.accessTokenSecret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -62,9 +62,9 @@ public class TokenUtils {
         }
     }
 
-    public static boolean validateToken(String token) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(accessTokenSecret.getBytes()).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(this.accessTokenSecret.getBytes()).build().parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException | UnsupportedJwtException
                  | ExpiredJwtException | IllegalArgumentException | SignatureException e) {

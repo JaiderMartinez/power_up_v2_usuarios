@@ -1,11 +1,9 @@
 package com.reto.usuario.infrastructure.configurations;
 
-import com.reto.usuario.domain.api.IAuthUseCasePort;
 import com.reto.usuario.domain.api.IUserUseCasePort;
 import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
 import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
 import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.usecase.AuthUseCase;
 import com.reto.usuario.domain.usecase.UserUseCase;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IRolEntityMapper;
 import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
@@ -21,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
 @Configuration
-public class BeanConfiguration {
+public class UserBeanConfiguration {
 
     private final IUserRepositoryMysql userRepositoryMysql;
     private final IUserEntityMapper userEntityMapper;
@@ -47,10 +45,4 @@ public class BeanConfiguration {
     public IUserUseCasePort userUseCasePort() {
         return new UserUseCase(userPersistencePort(), rolesPersistencePort(), passwordEncoder(), employeeRestaurantClientSmallSquare);
     }
-
-    @Bean
-    public IAuthUseCasePort authUseCasePort() {
-        return new AuthUseCase(userPersistencePort());
-    }
-
 }
