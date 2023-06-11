@@ -256,4 +256,29 @@ class UserRestControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value(ExceptionResponse.EMAIL_EXISTS.getMessage()));
     }
+
+    @Test
+    void test_registerUserAsCustomer_withFieldsValidFromObjectAsUserCustomerRequest_shouldResponseAStatusCreatedAndFieldIdUserFromValueInTheDataBase() throws Exception {
+
+    }
+
+    @Test
+    void test_registerUserAsCustomer_withAllFieldsEmptyExceptEmailInTheObjectAsUserCustomerRequest_shouldReturnStatusBadRequest() throws Exception {
+
+    }
+
+    @Test
+    void test_registerUserAsCustomer_withUserCustomerRequestFromFieldCellPhoneFormatIsInvalid_shouldReturnStatusBadRequest() throws Exception {
+
+    }
+
+    @Test
+    void test_registerUserAsCustomer_withUserCustomerRequestWhereFieldEmailWrongHisStructure_shouldReturnStatusBadRequest() throws Exception {
+
+    }
+
+    @Test
+    void test_registerUserAsCustomer_withEmailAlreadyExist_shouldReturnStatusConflict() throws Exception {
+
+    }
 }

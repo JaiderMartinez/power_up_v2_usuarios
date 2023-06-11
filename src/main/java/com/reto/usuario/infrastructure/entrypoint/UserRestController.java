@@ -1,5 +1,6 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
+import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
@@ -75,6 +76,22 @@ public class UserRestController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String tokenWithBearerPrefix) {
         final UserEmployeeResponseDto userEmployeeRegistered = this.userService.registerUserWithEmployeeRole(userRequestToCreateEmployeeDto, tokenWithBearerPrefix);
         return new ResponseEntity<>(userEmployeeRegistered, HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Add a new user with rol customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User customer created"),
+            @ApiResponse(responseCode = "400", description = "Wrong email structure"),
+            @ApiResponse(responseCode = "400", description = "Fields cannot be empty"),
+            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong"),
+            @ApiResponse(responseCode = "409", description = "The email already exists")
+    })
+    @PostMapping(value = "/customer")
+    public ResponseEntity<UserCustomerRequestDto> registerUserAsCustomer(@Parameter(
+            description = "Object to create an account as customer",
+            required = true, schema = @Schema(implementation = UserCustomerRequestDto.class))
+            @RequestBody UserCustomerRequestDto userCustomerRequestDto) {
+        return null;
     }
 
     @Operation(summary = "token verification or get user by id")
