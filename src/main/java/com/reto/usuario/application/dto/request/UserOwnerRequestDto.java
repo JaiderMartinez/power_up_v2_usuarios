@@ -1,11 +1,15 @@
 package com.reto.usuario.application.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRequestDto {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserOwnerRequestDto {
 
     private String name;
     private String lastName;

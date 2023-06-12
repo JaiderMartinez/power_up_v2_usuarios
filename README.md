@@ -16,9 +16,7 @@ como resultado obtenemos un token donde contiene nuestro email, rol, nombre y ap
         "password" : String
     }
 
-Se usa <span title="Es un algoritmo de hash de contraseñas diseñado específicamente para el almacenamiento seguro de contraseñas.
-Es conocido por su robustez y capacidad para resistir ataques de fuerza bruta.
-Bcrypt utiliza una combinación de hashing y salting para proteger las contraseñas.">Bcrypt</span> para la encriptacion del password. Para la creacion de una cuenta como CLIENTE no se necesita haberse autenticado.
+Se usa <span title="Es un algoritmo de hash de contraseñas diseñado específicamente para el almacenamiento seguro de contraseñas. Es conocido por su robustez y capacidad para resistir ataques de fuerza bruta. Bcrypt utiliza una combinación de hashing y salting para proteger las contraseñas.">Bcrypt</span> para la encriptacion del password. Para la creacion de una cuenta como CLIENTE no se necesita ingresar el token.
 
     {
         "name" : String,
@@ -54,7 +52,8 @@ Es necesario que el restaurante ya haya sido creado previamente. Se utiliza WebC
         "cellPhone" : String,
         "email" : String,
         "password" : String,
-        "idRol" : Long  
+        "idRol" : Long,
+        "idRestaurant" : Long
     }
 
 ## Estado del proyecto
@@ -73,15 +72,21 @@ Es necesario que el restaurante ya haya sido creado previamente. Se utiliza WebC
 
 <ul>
     <li>Puerto: <strong>8090</strong></li>
-    <li>Url de swagger: <strong>/swagger-ui/index.html</strong></li>
-    <li>Nombre de la base de datos: <strong>usuarios</strong></li>
+    <li>Url de swagger: <strong>http://localhost:8090/swagger-ui/index.html</strong></li>
     <li>Url para el login: <strong>localhost:8090/user-micro/auth/login</strong> como resultado me devuelve un access token</li>
     <li>Para cada peticion a un recurso se debe ingresar el token</li>
     <li>El token es ingresado en el Header de cada peticion, como key: el valor de "Authorization" y en el value: se agrega el prefijo "Bearer " mas el token</li>
-    <li>Diagramas de wireframes, Url: <strong><a href="https://app.moqups.com/OUdC5drISYQhJ9c7UvgCrmkoWVqBrYtx/view/page/a3afcac31?ui=0&fit_width=1">create account user</a></strong></li>
+    <li>Diagramas de wireframes, Url: <strong><a href="https://app.moqups.com/OUdC5drISYQhJ9c7UvgCrmkoWVqBrYtx/view/page/a3afcac31?ui=0">create account user</a></strong></li>
     <li>Url para crear usuario con rol de cliente: <strong>localhost:8090/user-micro/user/customer</strong></li>
     <li>Url para crear usuario con rol de propietario: <strong>localhost:8090/user-micro/user/owner</strong> tener en cuenta que para crear esta cuenta necesito haberme autenticado y tener el rol de ADMINISTRADOR e ingresar el token en el header</li>
     <li>Url para crear usuario con rol de empleado: <strong>localhost:8090/user-micro/user/employee</strong> tener en cuenta que para crear esta cuenta necesito haberme autenticado y tener el rol de PROPIETARIO e ingresar el token en el header</li>
+
+se usa el servicio de AWS la cual es RDS con una instancia de mariaDB, credenciales para el uso de la base de datos
+
+    {
+        spring.datasource.username=user-app
+        spring.datasource.password=12345@user
+    }
 </ul>
 
-## Siguiente Microservicio <a href="https://github.com/JohanaForero/microservicio_plazoleta.git">Plazoleta</a>
+## Siguiente Microservicio <a href="https://github.com/JaiderMartinez/power_up_v2_plazoleta.git">Plazoleta</a>
