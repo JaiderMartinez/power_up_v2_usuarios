@@ -53,7 +53,7 @@ class UserUseCaseTest {
         rolExpected.setName("PROPIETARIO");
         UserModel userExpected = new UserModel(1L, "Jose", "Martinez", 7388348534L,
                 "+574053986322", "test-owner@owner.com", passwordEncoder.encode("123"), rolExpected);
-        userExpected.setIdUser(1L);
+
         UserModel userActual = new UserModel();
         userActual.setName("Jose");
         userActual.setLastName("Martinez");

@@ -1,7 +1,7 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
-import com.reto.usuario.application.dto.request.UserRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
+import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
+import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
 import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
@@ -47,13 +47,13 @@ public class UserRestController {
     public ResponseEntity<UserOwnerResponseDto> registerUserAsOwner(@Parameter(
             description = "The user owner object to create",
             required = true,
-            schema = @Schema(implementation = UserRequestDto.class))
-            @RequestBody UserRequestDto userRequestDto) {
+            schema = @Schema(implementation = UserOwnerRequestDto.class))
+            @RequestBody UserOwnerRequestDto userRequestDto) {
         UserOwnerResponseDto userOwnerRegistered = userService.registerUserWithOwnerRole(userRequestDto);
         return new ResponseEntity<>(userOwnerRegistered, HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Add a new User with rol employee")
+    @Operation(summary = "Add a new user with rol employee")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User employee created"),
             @ApiResponse(responseCode = "400", description = "Wrong email structure"),
@@ -70,8 +70,8 @@ public class UserRestController {
     @PreAuthorize(value = "hasRole('PROPIETARIO')")
     public ResponseEntity<UserEmployeeResponseDto> registerUserAsEmployee(@Parameter(
             description = "Object to create an account for the restaurant employee",
-            required = true, schema = @Schema(implementation = UserRequestToCreateEmployeeDto.class))
-            @RequestBody UserRequestToCreateEmployeeDto userRequestToCreateEmployeeDto,
+            required = true, schema = @Schema(implementation = UserEmployeeRequestDto.class))
+            @RequestBody UserEmployeeRequestDto userRequestToCreateEmployeeDto,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String tokenWithBearerPrefix) {
         final UserEmployeeResponseDto userEmployeeRegistered = this.userService.registerUserWithEmployeeRole(userRequestToCreateEmployeeDto, tokenWithBearerPrefix);
         return new ResponseEntity<>(userEmployeeRegistered, HttpStatus.CREATED);
@@ -85,7 +85,7 @@ public class UserRestController {
     })
     @GetMapping(value = "/verifier")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
-    public ResponseEntity<UserResponseDto> userVerifierUserByToken(@Parameter(
+    public ResponseEntity<UserResponseDto> validateTokenAndReturnAllUserFieldsIfValueIdUserNotIsNull(@Parameter(
             description = "The id of the user to search for", schema = @Schema(implementation = Long.class))
             @RequestParam(name = "idUser", required = false) Long idUser ) {
         if(idUser != null) {
