@@ -1,5 +1,7 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
+import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
+import com.reto.usuario.application.dto.response.UserCustomerResponseDto;
 import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
 import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
@@ -77,6 +79,24 @@ public class UserRestController {
         return new ResponseEntity<>(userEmployeeRegistered, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Add a new user with rol customer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User customer created"),
+            @ApiResponse(responseCode = "400", description = "Wrong email structure"),
+            @ApiResponse(responseCode = "400", description = "Fields cannot be empty"),
+            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong"),
+            @ApiResponse(responseCode = "404", description = "The rol not found or is different the value of the database"),
+            @ApiResponse(responseCode = "409", description = "The email already exists")
+    })
+    @PostMapping(value = "/customer")
+    public ResponseEntity<UserCustomerResponseDto> registerUserAsCustomer(@Parameter(
+            description = "Object to create an account as customer",
+            required = true, schema = @Schema(implementation = UserCustomerRequestDto.class))
+            @RequestBody UserCustomerRequestDto userCustomerRequestDto) {
+        final UserCustomerResponseDto accountCustomerRegistered = this.userService.registerUserWithCustomerRole(userCustomerRequestDto);
+        return new ResponseEntity<>(accountCustomerRegistered, HttpStatus.CREATED);
+    }
+
     @Operation(summary = "token verification or get user by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Correct token and found user by id"),
@@ -85,7 +105,7 @@ public class UserRestController {
     })
     @GetMapping(value = "/verifier")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
-    public ResponseEntity<UserResponseDto> validateTokenAndReturnAllUserFieldsIfValueIdUserNotIsNull(@Parameter(
+    public ResponseEntity<UserResponseDto> validateTokenAndReturnAllFieldsFromUserIfValueIdUserNotIsNull(@Parameter(
             description = "The id of the user to search for", schema = @Schema(implementation = Long.class))
             @RequestParam(name = "idUser", required = false) Long idUser ) {
         if(idUser != null) {

@@ -1,5 +1,7 @@
 package com.reto.usuario.application.handler;
 
+import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
+import com.reto.usuario.application.dto.response.UserCustomerResponseDto;
 import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
 import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
@@ -12,6 +14,8 @@ public interface IUserService {
     UserOwnerResponseDto registerUserWithOwnerRole(UserOwnerRequestDto userRequestDto);
 
     UserEmployeeResponseDto registerUserWithEmployeeRole(UserEmployeeRequestDto userRequestToCreateEmployeeDto, String tokenWithPrefixBearer);
+
+    UserCustomerResponseDto registerUserWithCustomerRole(UserCustomerRequestDto userCustomerRequestDto);
 
     UserResponseDto getUserById(Long idUser);
 
