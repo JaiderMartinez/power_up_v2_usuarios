@@ -23,6 +23,7 @@ public class UserUseCase implements IUserUseCasePort {
     private final PasswordEncoder passwordEncoder;
     private final IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare;
     private static final String ROLE_EMPLOYEE = "EMPLEADO";
+    private static final String ROLE_CUSTOMER = "CLIENTE";
 
     public UserUseCase(IUserPersistenceDomainPort userPersistenceDomainPort, IRolPersistenceDomainPort rolesPersistenceDomainPort,
                        PasswordEncoder passwordEncoder, IEmployeeRestaurantClientSmallSquare employeeRestaurantClientSmallSquare) {
@@ -51,6 +52,15 @@ public class UserUseCase implements IUserUseCasePort {
         EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto(resultWhenSaveAnEmployeeUser.getIdUser(), idRestaurant);
         this.employeeRestaurantClientSmallSquare.saveUserEmployeeToARestaurant(employeeRestaurantRequestDto, tokenWithBearerPrefix);
         return resultWhenSaveAnEmployeeUser;
+    }
+
+    @Override
+    public UserModel registerUserWithCustomerRole(UserModel userCustomerRequest) {
+        restrictionsWhenSavingAUser(userCustomerRequest);
+        final RolModel roleCustomerFound = findRoleByIdAndCompareRoleName(ROLE_CUSTOMER, userCustomerRequest.getRol().getIdRol());
+        userCustomerRequest.setPassword(this.passwordEncoder.encode(userCustomerRequest.getPassword()));
+        userCustomerRequest.setRol(roleCustomerFound);
+        return this.userPersistenceDomainPort.saveUser(userCustomerRequest);
     }
 
     private RolModel findRoleByIdAndCompareRoleName(String roleName, Long idRol) {

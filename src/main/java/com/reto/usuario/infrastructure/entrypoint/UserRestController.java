@@ -3,6 +3,7 @@ package com.reto.usuario.infrastructure.entrypoint;
 import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
+import com.reto.usuario.application.dto.response.UserCustomerResponseDto;
 import com.reto.usuario.application.dto.response.UserEmployeeResponseDto;
 import com.reto.usuario.application.dto.response.UserOwnerResponseDto;
 import com.reto.usuario.application.dto.response.UserResponseDto;
@@ -84,14 +85,16 @@ public class UserRestController {
             @ApiResponse(responseCode = "400", description = "Wrong email structure"),
             @ApiResponse(responseCode = "400", description = "Fields cannot be empty"),
             @ApiResponse(responseCode = "400", description = "The cell phone format is wrong"),
+            @ApiResponse(responseCode = "404", description = "The rol not found or is different the value of the database"),
             @ApiResponse(responseCode = "409", description = "The email already exists")
     })
     @PostMapping(value = "/customer")
-    public ResponseEntity<UserCustomerRequestDto> registerUserAsCustomer(@Parameter(
+    public ResponseEntity<UserCustomerResponseDto> registerUserAsCustomer(@Parameter(
             description = "Object to create an account as customer",
             required = true, schema = @Schema(implementation = UserCustomerRequestDto.class))
             @RequestBody UserCustomerRequestDto userCustomerRequestDto) {
-        return null;
+        final UserCustomerResponseDto accountCustomerRegistered = this.userService.registerUserWithCustomerRole(userCustomerRequestDto);
+        return new ResponseEntity(accountCustomerRegistered, HttpStatus.CREATED);
     }
 
     @Operation(summary = "token verification or get user by id")

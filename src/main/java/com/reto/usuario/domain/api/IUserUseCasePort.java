@@ -8,6 +8,8 @@ public interface IUserUseCasePort {
 
     UserModel registerUserWithEmployeeRole(UserModel userModel, String tokenWithBearerPrefix, Long idRestaurant);
 
+    UserModel registerUserWithCustomerRole(UserModel userCustomerRequest);
+
     UserModel findUserByEmail(String email);
 
     UserModel getUserById(Long idUser);

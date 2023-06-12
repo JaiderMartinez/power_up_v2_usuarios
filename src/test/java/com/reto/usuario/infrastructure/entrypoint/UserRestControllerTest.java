@@ -1,6 +1,7 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
@@ -24,6 +25,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.transaction.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -62,11 +65,13 @@ class UserRestControllerTest {
     private static final String USER_OWNER_API_PATH = "/user-micro/user/owner";
     private static final String USER_EMPLOYEE_API_PATH = "/user-micro/user/employee";
     private static final String TOKEN = "Bearer + token";
+    private static final String USER_CUSTOMER_API_PATH = "/user-micro/user/customer";
 
     @BeforeAll
     void initializeTestEnvironment() {
         rolRepositoryMysql.save(new RolEntity(1L, "PROPIETARIO", "Restaurant owner"));
         rolRepositoryMysql.save(new RolEntity(2L, "EMPLEADO", "Restaurant employee"));
+        rolRepositoryMysql.save(new RolEntity(3L, "CLIENTE", "customer of the small square"));
     }
 
     @BeforeEach
@@ -257,28 +262,73 @@ class UserRestControllerTest {
                 .andExpect(jsonPath("$.message").value(ExceptionResponse.EMAIL_EXISTS.getMessage()));
     }
 
+    @Transactional
     @Test
-    void test_registerUserAsCustomer_withFieldsValidFromObjectAsUserCustomerRequest_shouldResponseAStatusCreatedAndFieldIdUserFromValueInTheDataBase() throws Exception {
-
+    void test_registerUserAsCustomer_withFieldsValidFromObjectAsUserCustomerRequestDto_shouldResponseAStatusCreatedAndFieldIdUserFromValueInTheDataBase() throws Exception {
+        UserCustomerRequestDto userCustomerRequestDto = new UserCustomerRequestDto("Jose", "Martinez", 193235345L, "3154579374",
+                "customer@customer.com", PASSWORD, 3L);
+        mockMvc.perform(post(USER_CUSTOMER_API_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCustomerRequestDto)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.idUser").value(1L));
     }
 
     @Test
-    void test_registerUserAsCustomer_withAllFieldsEmptyExceptEmailInTheObjectAsUserCustomerRequest_shouldReturnStatusBadRequest() throws Exception {
-
+    void test_registerUserAsCustomer_withAllFieldsEmptyExceptEmailAndIdRolInTheObjectAsUserCustomerRequest_shouldReturnStatusBadRequest() throws Exception {
+        UserCustomerRequestDto userCustomerRequestDto = new UserCustomerRequestDto("", "", null, "",
+                "customer@customer.com", "", 3L);
+        mockMvc.perform(post(USER_CUSTOMER_API_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCustomerRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ExceptionResponse.EMPTY_FIELDS.getMessage()));
     }
 
     @Test
     void test_registerUserAsCustomer_withUserCustomerRequestFromFieldCellPhoneFormatIsInvalid_shouldReturnStatusBadRequest() throws Exception {
-
+        UserCustomerRequestDto userCustomerRequestDto = new UserCustomerRequestDto("Jose", "Martinez", 193235345L,
+                "293743443154579374", "customer@customer.com", PASSWORD, 3L);
+        mockMvc.perform(post(USER_CUSTOMER_API_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCustomerRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ExceptionResponse.INVALID_CELL_PHONE_FORMAT.getMessage()));
     }
 
     @Test
     void test_registerUserAsCustomer_withUserCustomerRequestWhereFieldEmailWrongHisStructure_shouldReturnStatusBadRequest() throws Exception {
-
+        UserCustomerRequestDto userCustomerRequestDto = new UserCustomerRequestDto("Jose", "Martinez", 193235345L, "3154579374",
+                "customer-at-sign-customer.com", PASSWORD, 3L);
+        mockMvc.perform(post(USER_CUSTOMER_API_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCustomerRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(ExceptionResponse.INVALID_EMAIL_FORMAT.getMessage()));
     }
 
     @Test
     void test_registerUserAsCustomer_withEmailAlreadyExist_shouldReturnStatusConflict() throws Exception {
+        this.userRepositoryMysql.save(new UserEntity(1L, "Jose", "Santiago", 1243545623L,
+                "+573154579374", "customer@customer.com", PASSWORD, new RolEntity(3L, ROLE_OWNER, "Restaurant owner")));
 
+        UserCustomerRequestDto userCustomerRequestDto = new UserCustomerRequestDto("Jose", "Martinez", 193235345L,
+                "3154579374", "customer@customer.com", PASSWORD, 3L);
+        mockMvc.perform(post(USER_CUSTOMER_API_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCustomerRequestDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value(ExceptionResponse.EMAIL_EXISTS.getMessage()));
+    }
+
+    @Test
+    void test_registerUserAsCustomer_withFieldIdRolNotFoundInTheDataBase_shouldReturnStatusNotFound() throws Exception {
+        UserCustomerRequestDto userCustomerRequestDtoWhereIdRolNotExist = new UserCustomerRequestDto("Jose", "Martinez", 193235345L,
+                "3154579374", "customer@customer.com", PASSWORD, 100000L);
+        mockMvc.perform(post(USER_CUSTOMER_API_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userCustomerRequestDtoWhereIdRolNotExist)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(ExceptionResponse.ROL_NOT_FOUND.getMessage()));
     }
 }
