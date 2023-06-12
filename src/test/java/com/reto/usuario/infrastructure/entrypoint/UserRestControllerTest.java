@@ -2,8 +2,6 @@ package com.reto.usuario.infrastructure.entrypoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
 import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
 import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;

@@ -1,8 +1,6 @@
 package com.reto.usuario.application.handler.implementation;
 
 import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestToCreateEmployeeDto;
 import com.reto.usuario.application.dto.response.UserCustomerResponseDto;
 import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
 import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
@@ -37,7 +35,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserEmployeeResponseDto registerUserWithEmployeeRole(UserEmployeeRequestDto userRequestToCreateEmployeeDto, String tokenWithPrefixBearer) {
-        final UserModel userEmployeeRequestModel = this.userRequestMapper.toUserModelEmployee(userRequestToCreateEmployeeDto);
+        final UserModel userEmployeeRequestModel = this.userRequestMapper.userEmployeeRequestDtoUserModel(userRequestToCreateEmployeeDto);
         final UserModel userEmployeeRegisteredModel = this.userUseCasePort.registerUserWithEmployeeRole(userEmployeeRequestModel, tokenWithPrefixBearer, userRequestToCreateEmployeeDto.getIdRestaurant());
         return userResponseMapper.toUserEmployeeResponseDto(userEmployeeRegisteredModel);
     }

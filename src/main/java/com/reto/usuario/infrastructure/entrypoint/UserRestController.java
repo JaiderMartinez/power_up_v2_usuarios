@@ -1,7 +1,6 @@
 package com.reto.usuario.infrastructure.entrypoint;
 
 import com.reto.usuario.application.dto.request.UserCustomerRequestDto;
-import com.reto.usuario.application.dto.request.UserRequestDto;
 import com.reto.usuario.application.dto.response.UserCustomerResponseDto;
 import com.reto.usuario.application.dto.request.UserEmployeeRequestDto;
 import com.reto.usuario.application.dto.request.UserOwnerRequestDto;
@@ -95,7 +94,7 @@ public class UserRestController {
             required = true, schema = @Schema(implementation = UserCustomerRequestDto.class))
             @RequestBody UserCustomerRequestDto userCustomerRequestDto) {
         final UserCustomerResponseDto accountCustomerRegistered = this.userService.registerUserWithCustomerRole(userCustomerRequestDto);
-        return new ResponseEntity(accountCustomerRegistered, HttpStatus.CREATED);
+        return new ResponseEntity<>(accountCustomerRegistered, HttpStatus.CREATED);
     }
 
     @Operation(summary = "token verification or get user by id")
@@ -106,7 +105,7 @@ public class UserRestController {
     })
     @GetMapping(value = "/verifier")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
-    public ResponseEntity<UserResponseDto> validateTokenAndReturnAllUserFieldsIfValueIdUserNotIsNull(@Parameter(
+    public ResponseEntity<UserResponseDto> validateTokenAndReturnAllFieldsFromUserIfValueIdUserNotIsNull(@Parameter(
             description = "The id of the user to search for", schema = @Schema(implementation = Long.class))
             @RequestParam(name = "idUser", required = false) Long idUser ) {
         if(idUser != null) {
