@@ -17,7 +17,6 @@ public class AuthBeanConfiguration {
     private final IUserPersistenceDomainPort userPersistenceDomainPort;
     private final TokenUtils tokenUtils;
 
-
     @Bean
     public TokenServiceInterfacePort tokenServiceInterfacePort() {
         return new TokenServiceAdapter(this.tokenUtils);

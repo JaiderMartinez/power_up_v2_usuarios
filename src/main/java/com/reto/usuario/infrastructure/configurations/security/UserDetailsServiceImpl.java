@@ -1,6 +1,7 @@
 package com.reto.usuario.infrastructure.configurations.security;
 
 import com.reto.usuario.domain.api.IUserUseCasePort;
+import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 import com.reto.usuario.domain.model.UserModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public boolean isValidateRoles(String email, String rol) {
-        UserModel userModel = userUseCasePort.findUserByEmail(email);
-        return userModel.getRol().getName().equals(rol);
+            UserModel userModel = userUseCasePort.findUserByEmail(email);
+            return userModel.getRol().getName().equals(rol);
     }
 }

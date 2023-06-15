@@ -1,6 +1,7 @@
 package com.reto.usuario.infrastructure.configurations.security.authorization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 import com.reto.usuario.infrastructure.configurations.security.utils.TokenUtils;
 import com.reto.usuario.infrastructure.configurations.security.UserDetailsServiceImpl;
 import com.reto.usuario.infrastructure.exceptionhandler.ExceptionResponse;
@@ -30,8 +31,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     private final TokenUtils tokenUtils;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String bearerToken = request.getHeader("Authorization");
         if(bearerToken != null && bearerToken.startsWith("Bearer ") &&
@@ -46,23 +46,36 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                                 singletonMap("message", ExceptionResponse.TOKEN_INVALID.getMessage())));
                 return;
             }
-
             UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = TokenUtils.getAuthentication(token);
             String role = usernamePasswordAuthenticationToken.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList()).get(0).replace("ROLE_", "");
-
-            if( !this.userDetailsService.isValidateRoles(usernamePasswordAuthenticationToken.getName(), role)) {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.getWriter().write(new ObjectMapper()
-                        .writeValueAsString(Collections.
-                                singletonMap("message", ExceptionResponse.ROLE_IN_TOKEN_IS_INVALID.getMessage())));
+            try {
+                if (!this.userDetailsService.isValidateRoles(usernamePasswordAuthenticationToken.getName(), role)) {
+                    handleUnauthorizedRoleException(response);
+                    return;
+                }
+            } catch (EmailNotFoundException e) {
+                handleEmailNotFoundException(response, e.getMessage());
                 return;
             }
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void handleUnauthorizedRoleException(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(new ObjectMapper()
+                .writeValueAsString(Collections.singletonMap("message", ExceptionResponse.ROLE_IN_TOKEN_IS_INVALID.getMessage())));
+    }
+
+    private void handleEmailNotFoundException(HttpServletResponse response, String messageException) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(new ObjectMapper()
+                .writeValueAsString(Collections.singletonMap("message", messageException)));
     }
 }

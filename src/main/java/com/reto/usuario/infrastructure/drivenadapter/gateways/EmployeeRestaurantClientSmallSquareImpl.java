@@ -21,7 +21,7 @@ public class EmployeeRestaurantClientSmallSquareImpl implements IEmployeeRestaur
 
     @Override
     public void saveUserEmployeeToARestaurant(EmployeeRestaurantClientRequestDto employeeRestaurantClientRequestDto, String tokenWithPrefixBearer) {
-        webClient.post().uri(uriBuilder -> uriBuilder.path("services-owner-restaurant/add-employee-restaurant")
+        webClient.post().uri(uriBuilder -> uriBuilder.path("restaurant/employee")
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, tokenWithPrefixBearer)
                 .bodyValue(employeeRestaurantClientRequestDto)
