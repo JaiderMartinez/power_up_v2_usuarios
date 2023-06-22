@@ -1,8 +1,11 @@
-<h1 align="center">Plaza de comidas</h1></center>
+<h1 align="center">Plaza de comidas</h1>
 <h2>Microservicio Usuario</h2>
 <img src="https://img.shields.io/badge/%E2%98%95%20Java-%23c98524.svg?style=logoColor=white" alt="Logo Java" />
 <img src="https://img.shields.io/badge/-MySQL-005C84?style=flat-square&logo=mysql&logoColor=black" alt="Logo Mysql" />
 <img src="https://img.shields.io/badge/Swagger-%2385EA2D.svg?&style=flat-square&logo=swagger&logoColor=blue" alt="Logo Swagger" />
+<img src="https://img.shields.io/badge/Spring%20Security-%23569A31.svg?&style=flat-square&logo=spring&logoColor=white" alt="Logo Spring Security" />
+<img src="https://img.shields.io/badge/Amazon%20RDS%20MariaDB-%23FF9900.svg?&style=flat-square&logo=amazonaws&logoColor=white&color=FF9900" alt="Amazon RDS MariaDB" />
+
 <p>Encargado de administrar los roles, creacion de cuentas y login de los usuarios de la plaza de comidas.
 <br></p>
 
@@ -56,37 +59,62 @@ Es necesario que el restaurante ya haya sido creado previamente. Se utiliza WebC
         "idRestaurant" : Long
     }
 
-## Estado del proyecto
+## Requisitos previos
 
-<p style="text-align:center;" ><img src="https://img.shields.io/badge/STATUS-EN%20DESARROLLO-green" alt="Status en desarollo">
-<h4 style="text-align:center;" >
-👷 Proyecto en construcción 🚧
-</h4>
+<ul>
+    <li>Java 8 o superior</li>
+    <li>Gradle - Groovy</li>
+    <li>Instancia del servicio de RDS de AWS</li>
+</ul>
 
 ## Funcionalidades
 - `Historia de usuario 1`: Crear Propietario
 - `Historia de usuario 6`: Crear cuenta empleado
 - `Historia de usuario 8`: Crear cuenta Cliente
 
+## Configuración de la instancia de RDS de MariaDB
+Para utilizar el microservicio Usuario, es necesario configurar y tener acceso a una instancia de Amazon RDS con una base de datos MariaDB. A continuación, se detallan los pasos para configurar la instancia:
+
+<ul>
+    <li>Creación de la instancia de RDS de MariaDB</li>
+    <li>Obtención de los detalles de conexión</li>
+    <li>Obtención de los detalles de conexión</li>
+    <li>Configuración en el microservicio Usuario: </li>Actualiza la configuración de la base de datos con los detalles de conexión de tu instancia de RDS:
+
+    spring.datasource.url=jdbc:mysql://<endpoint-de-rds>:<puerto>/<nombre-database>
+    spring.datasource.username=<usuario-de-la-database>
+    spring.datasource.password=<contraseña>    
+
+</ul>
+
+## Spring Security
+
+La API está protegida mediante Spring Security y el control de acceso basado en roles.
+
+<li>Url de swagger: <strong>http://localhost:8090/swagger-ui/index.html</strong></li>
+<li>Url para el login: <strong>localhost:8090/user-micro/auth/login</strong> como resultado me devuelve un access token</li>
+
+    access.token.validity.seconds=<duracion-expiración-token>
+    access.token.secret=<clave-secreta>    
+
+### Generación de tokens
+Cuando un usuario inicia sesión correctamente, se genera un token de acceso que contiene la información de autenticación y autorización necesaria para realizar solicitudes posteriores. El token se genera utilizando el algoritmo de firma JSON Web Tokens (JWT) y se firma con una clave secreta compartida.
+
+El token contiene la siguiente información:
+
+Subject (sub): Email único del usuario autenticado.<br>
+Roles (rol): Los roles asignados al usuario, que determinan sus permisos en la aplicación.<br>
+Fecha de expiración (exp): La fecha y hora en la que el token expirará y ya no será válido.    
+Name: nombre del usuario autenticado<br>
+LastName: Apellido del usuario autenticado. 
+
 ## 🛠️ Abre y ejecuta el proyecto
 
 <ul>
-    <li>Puerto: <strong>8090</strong></li>
-    <li>Url de swagger: <strong>http://localhost:8090/swagger-ui/index.html</strong></li>
-    <li>Url para el login: <strong>localhost:8090/user-micro/auth/login</strong> como resultado me devuelve un access token</li>
-    <li>Para cada peticion a un recurso se debe ingresar el token</li>
-    <li>El token es ingresado en el Header de cada peticion, como key: el valor de "Authorization" y en el value: se agrega el prefijo "Bearer " mas el token</li>
     <li>Diagramas de wireframes, Url: <strong><a href="https://app.moqups.com/OUdC5drISYQhJ9c7UvgCrmkoWVqBrYtx/view/page/a3afcac31?ui=0">create account user</a></strong></li>
     <li>Url para crear usuario con rol de cliente: <strong>localhost:8090/user-micro/user/customer</strong></li>
     <li>Url para crear usuario con rol de propietario: <strong>localhost:8090/user-micro/user/owner</strong> tener en cuenta que para crear esta cuenta necesito haberme autenticado y tener el rol de ADMINISTRADOR e ingresar el token en el header</li>
     <li>Url para crear usuario con rol de empleado: <strong>localhost:8090/user-micro/user/employee</strong> tener en cuenta que para crear esta cuenta necesito haberme autenticado y tener el rol de PROPIETARIO e ingresar el token en el header</li>
-
-se usa el servicio de AWS la cual es RDS con una instancia de mariaDB, credenciales para el uso de la base de datos
-
-    {
-        spring.datasource.username=user-app
-        spring.datasource.password=12345@user
-    }
 </ul>
 
 ## Siguiente Microservicio <a href="https://github.com/JaiderMartinez/power_up_v2_plazoleta.git">Plazoleta</a>

@@ -30,7 +30,7 @@ public class AuthServiceImpl implements IAuthService {
         } catch (AuthenticationException e) {
             throw new AuthenticationCredentialsNotFoundException(e.getMessage());
         }
-        String tokenGenerated = authUseCasePort.signInUseCase(authCredentialsRequestMapper.toAuthCredentials(authCredentialsRequest));
+        String tokenGenerated = authUseCasePort.signInUseCase(authCredentialsRequestMapper.toAuthCredentialModel(authCredentialsRequest));
         TokenResponseDto tokenResponseDto = new TokenResponseDto();
         tokenResponseDto.setAccessToken(tokenGenerated);
         return tokenResponseDto;

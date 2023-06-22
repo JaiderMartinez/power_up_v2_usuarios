@@ -1,8 +1,8 @@
 package com.reto.usuario.domain.api;
 
-import com.reto.usuario.domain.dto.AuthCredentials;
+import com.reto.usuario.domain.model.AuthCredentialModel;
 
 public interface IAuthUseCasePort {
 
-    String signInUseCase(AuthCredentials authCredentials);
+    String signInUseCase(AuthCredentialModel authCredentials);
 }

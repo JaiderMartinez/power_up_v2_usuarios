@@ -1,6 +1,6 @@
-package com.reto.usuario.infrastructure.drivenadapter.repository;
+package com.reto.usuario.infrastructure.drivenadapter.jpa.repository;
 
-import com.reto.usuario.infrastructure.drivenadapter.entity.RolEntity;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.entity.RolEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

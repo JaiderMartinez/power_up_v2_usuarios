@@ -1,13 +1,13 @@
-package com.reto.usuario.domain.dto;
+package com.reto.usuario.domain.model;
 
-public class AuthCredentials {
+public class AuthCredentialModel {
 
     private String email;
     private String password;
 
-    public AuthCredentials() {}
+    public AuthCredentialModel() {}
 
-    public AuthCredentials(String email, String password) {
+    public AuthCredentialModel(String email, String password) {
         this.email = email;
         this.password = password;
     }

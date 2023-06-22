@@ -1,4 +1,4 @@
-package com.reto.usuario.domain.spi;
+package com.reto.usuario.domain.spi.persistence;
 
 import com.reto.usuario.domain.model.RolModel;
 

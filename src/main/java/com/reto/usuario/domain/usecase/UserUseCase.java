@@ -1,18 +1,18 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.api.IUserUseCasePort;
-import com.reto.usuario.domain.dto.EmployeeRestaurantClientRequestDto;
+import com.reto.usuario.domain.model.EmployeeRestaurantClientModel;
 import com.reto.usuario.domain.exceptions.EmailExistsException;
 import com.reto.usuario.domain.exceptions.EmptyFieldsException;
 import com.reto.usuario.domain.exceptions.InvalidCellPhoneFormatException;
 import com.reto.usuario.domain.exceptions.InvalidEmailFormatException;
 import com.reto.usuario.domain.exceptions.RolNotFoundException;
 import com.reto.usuario.domain.exceptions.UserNotFoundException;
-import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
+import com.reto.usuario.domain.spi.clients.IEmployeeRestaurantClientSmallSquare;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
-import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
-import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
+import com.reto.usuario.domain.spi.persistence.IRolPersistenceDomainPort;
+import com.reto.usuario.domain.spi.persistence.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.exceptions.EmailNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -50,7 +50,7 @@ public class UserUseCase implements IUserUseCasePort {
         userModel.setPassword(this.passwordEncoder.encode(userModel.getPassword()));
         userModel.setRol(rolEmployeeFound);
         final UserModel resultWhenSaveAnEmployeeUser = this.userPersistenceDomainPort.saveUser(userModel);
-        EmployeeRestaurantClientRequestDto employeeRestaurantRequestDto = new EmployeeRestaurantClientRequestDto(resultWhenSaveAnEmployeeUser.getIdUser(), idRestaurant);
+        EmployeeRestaurantClientModel employeeRestaurantRequestDto = new EmployeeRestaurantClientModel(resultWhenSaveAnEmployeeUser.getIdUser(), idRestaurant);
         this.employeeRestaurantClientSmallSquare.saveUserEmployeeToARestaurant(employeeRestaurantRequestDto, tokenWithBearerPrefix);
         return resultWhenSaveAnEmployeeUser;
     }
