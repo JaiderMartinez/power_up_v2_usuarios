@@ -1,11 +1,11 @@
 package com.reto.usuario.application.mapper.request;
 
 import com.reto.usuario.application.dto.request.AuthCredentialsRequest;
-import com.reto.usuario.domain.dto.AuthCredentials;
+import com.reto.usuario.domain.model.AuthCredentialModel;
 import org.mapstruct.Mapper;
 
 @Mapper
 public interface IAuthCredentialsRequestMapper {
 
-    AuthCredentials toAuthCredentials(AuthCredentialsRequest authCredentialsRequest);
+    AuthCredentialModel toAuthCredentialModel(AuthCredentialsRequest authCredentialsRequest);
 }

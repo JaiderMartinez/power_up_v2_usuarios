@@ -1,7 +1,7 @@
-package com.reto.usuario.infrastructure.drivenadapter.mapper;
+package com.reto.usuario.infrastructure.drivenadapter.jpa.mapper;
 
 import com.reto.usuario.domain.model.RolModel;
-import com.reto.usuario.infrastructure.drivenadapter.entity.RolEntity;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.entity.RolEntity;
 import org.mapstruct.Mapper;
 
 @Mapper

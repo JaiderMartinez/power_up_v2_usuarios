@@ -1,10 +1,10 @@
 package com.reto.usuario.domain.usecase;
 
 import com.reto.usuario.domain.api.IAuthUseCasePort;
-import com.reto.usuario.domain.dto.AuthCredentials;
+import com.reto.usuario.domain.model.AuthCredentialModel;
 import com.reto.usuario.domain.model.UserModel;
-import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.spi.TokenServiceInterfacePort;
+import com.reto.usuario.domain.spi.persistence.IUserPersistenceDomainPort;
+import com.reto.usuario.domain.spi.persistence.TokenServiceInterfacePort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class AuthUseCase implements IAuthUseCasePort {
     }
 
     @Override
-    public String signInUseCase(AuthCredentials authCredentials) {
+    public String signInUseCase(AuthCredentialModel authCredentials) {
         UserModel user = userPersistenceDomainPort.findByEmail( authCredentials.getEmail() );
         List<String> authority = new ArrayList<>();
         authority.add("ROLE_" + user.getRol().getName());

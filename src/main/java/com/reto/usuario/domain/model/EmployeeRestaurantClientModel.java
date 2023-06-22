@@ -1,14 +1,14 @@
-package com.reto.usuario.domain.dto;
+package com.reto.usuario.domain.model;
 
-public class EmployeeRestaurantClientRequestDto {
+public class EmployeeRestaurantClientModel {
 
     private Long idUserEmployee;
     private Long idRestaurant;
 
-    public EmployeeRestaurantClientRequestDto() {
+    public EmployeeRestaurantClientModel() {
     }
 
-    public EmployeeRestaurantClientRequestDto(Long idUserEmployee, Long idRestaurant) {
+    public EmployeeRestaurantClientModel(Long idUserEmployee, Long idRestaurant) {
         this.idUserEmployee = idUserEmployee;
         this.idRestaurant = idRestaurant;
     }

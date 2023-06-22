@@ -30,30 +30,30 @@ public class UserServiceImpl implements IUserService {
     public UserOwnerResponseDto registerUserWithOwnerRole(UserOwnerRequestDto userRequestDto) {
         final UserModel userRequestModel = this.userRequestMapper.toUserModel(userRequestDto);
         final UserModel userRegisteredModel = this.userUseCasePort.registerUserWithOwnerRole(userRequestModel );
-        return this.userResponseMapper.toUserOwnerResponseDto(userRegisteredModel );
+        return this.userResponseMapper.userModelToUserOwnerResponseDto(userRegisteredModel );
     }
 
     @Override
     public UserEmployeeResponseDto registerUserWithEmployeeRole(UserEmployeeRequestDto userRequestToCreateEmployeeDto, String tokenWithPrefixBearer) {
         final UserModel userEmployeeRequestModel = this.userRequestMapper.userEmployeeRequestDtoUserModel(userRequestToCreateEmployeeDto);
         final UserModel userEmployeeRegisteredModel = this.userUseCasePort.registerUserWithEmployeeRole(userEmployeeRequestModel, tokenWithPrefixBearer, userRequestToCreateEmployeeDto.getIdRestaurant());
-        return userResponseMapper.toUserEmployeeResponseDto(userEmployeeRegisteredModel);
+        return userResponseMapper.userModelToUserEmployeeResponseDto(userEmployeeRegisteredModel);
     }
 
     @Override
     public UserCustomerResponseDto registerUserWithCustomerRole(UserCustomerRequestDto userCustomerRequestDto) {
         final UserModel userCustomerRequestModel = this.userRequestMapper.userCustomerRequestDtoToUserModel(userCustomerRequestDto);
         final UserModel userCustomerRegisteredModel = this.userUseCasePort.registerUserWithCustomerRole(userCustomerRequestModel);
-        return this.userResponseMapper.userModeltoUserCustomerResponseDto(userCustomerRegisteredModel);
+        return this.userResponseMapper.userModelToUserCustomerResponseDto(userCustomerRegisteredModel);
     }
 
     @Override
     public UserResponseDto getUserById(Long idUser) {
-        return userResponseMapper.toUserResponseDto(userUseCasePort.getUserById(idUser));
+        return userResponseMapper.userModeltoUserResponseDto(userUseCasePort.getUserById(idUser));
     }
 
     @Override
     public UserWithFieldIdUserResponseDto getUserByUniqueEmail(String email) {
-        return this.userResponseMapper.toUserWithFieldIdUserResponseDto(this.userUseCasePort.findUserByEmail(email));
+        return this.userResponseMapper.userModelToUserWithFieldIdUserResponseDto(this.userUseCasePort.findUserByEmail(email));
     }
 }

@@ -1,9 +1,9 @@
-package com.reto.usuario.infrastructure.drivenadapter.persistence;
+package com.reto.usuario.infrastructure.drivenadapter.jpa.adapter;
 
 import com.reto.usuario.domain.model.UserModel;
-import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
-import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
+import com.reto.usuario.domain.spi.persistence.IUserPersistenceDomainPort;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.mapper.IUserEntityMapper;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.repository.IUserRepositoryMysql;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

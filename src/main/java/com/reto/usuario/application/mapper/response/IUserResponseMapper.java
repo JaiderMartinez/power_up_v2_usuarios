@@ -13,14 +13,14 @@ import org.mapstruct.Mapping;
 public interface IUserResponseMapper {
 
     @Mapping(target = "rol", source = "rol.name")
-    UserResponseDto toUserResponseDto(UserModel userModel);
+    UserResponseDto userModeltoUserResponseDto(UserModel userModel);
 
-    UserOwnerResponseDto toUserOwnerResponseDto(UserModel userModel);
+    UserOwnerResponseDto userModelToUserOwnerResponseDto(UserModel userModel);
 
-    UserEmployeeResponseDto toUserEmployeeResponseDto(UserModel userModel);
+    UserEmployeeResponseDto userModelToUserEmployeeResponseDto(UserModel userModel);
 
     @Mapping(target = "rol", source = "rol.name")
-    UserWithFieldIdUserResponseDto toUserWithFieldIdUserResponseDto(UserModel userModel);
+    UserWithFieldIdUserResponseDto userModelToUserWithFieldIdUserResponseDto(UserModel userModel);
 
-    UserCustomerResponseDto userModeltoUserCustomerResponseDto(UserModel userModel);
+    UserCustomerResponseDto userModelToUserCustomerResponseDto(UserModel userModel);
 }

@@ -37,7 +37,7 @@ public class UserRestController {
 
     @Operation(summary = "Add a new User with rol owner")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User created", content = @Content),
+            @ApiResponse(responseCode = "201", description = "User created"),
             @ApiResponse(responseCode = "400", description = "Wrong email structure", content = @Content),
             @ApiResponse(responseCode = "400", description = "Fields cannot be empty", content = @Content),
             @ApiResponse(responseCode = "400", description = "The cell phone format is wrong", content = @Content),
@@ -58,15 +58,15 @@ public class UserRestController {
     @Operation(summary = "Add a new user with rol employee")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User employee created"),
-            @ApiResponse(responseCode = "400", description = "Wrong email structure"),
-            @ApiResponse(responseCode = "400", description = "Fields cannot be empty"),
-            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong"),
-            @ApiResponse(responseCode = "401", description = "Username or role in the token is invalid"),
-            @ApiResponse(responseCode = "403", description = "The user does not have the owner role"),
-            @ApiResponse(responseCode = "404", description = "The idRol not found or role other than employee"),
-            @ApiResponse(responseCode = "404", description = "The user does not have a restaurant"),
-            @ApiResponse(responseCode = "409", description = "The email already exists"),
-            @ApiResponse(responseCode = "502", description = "Connection refused: connect")
+            @ApiResponse(responseCode = "400", description = "Wrong email structure", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Fields cannot be empty", content = @Content),
+            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Username or role in the token is invalid", content = @Content),
+            @ApiResponse(responseCode = "403", description = "The user does not have the owner role", content = @Content),
+            @ApiResponse(responseCode = "404", description = "The idRol not found or role other than employee", content = @Content),
+            @ApiResponse(responseCode = "404", description = "The user does not have a restaurant", content = @Content),
+            @ApiResponse(responseCode = "409", description = "The email already exists", content = @Content),
+            @ApiResponse(responseCode = "502", description = "Connection refused: connect", content = @Content)
     })
     @PostMapping(value = "/employee")
     @PreAuthorize(value = "hasRole('PROPIETARIO')")
@@ -82,11 +82,11 @@ public class UserRestController {
     @Operation(summary = "Add a new user with rol customer")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User customer created"),
-            @ApiResponse(responseCode = "400", description = "Wrong email structure"),
-            @ApiResponse(responseCode = "400", description = "Fields cannot be empty"),
-            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong"),
-            @ApiResponse(responseCode = "404", description = "The rol not found or is different the value of the database"),
-            @ApiResponse(responseCode = "409", description = "The email already exists")
+            @ApiResponse(responseCode = "400", description = "Wrong email structure", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Fields cannot be empty", content = @Content),
+            @ApiResponse(responseCode = "400", description = "The cell phone format is wrong", content = @Content),
+            @ApiResponse(responseCode = "404", description = "The rol not found or is different the value of the database", content = @Content),
+            @ApiResponse(responseCode = "409", description = "The email already exists", content = @Content)
     })
     @PostMapping(value = "/customer")
     public ResponseEntity<UserCustomerResponseDto> registerUserAsCustomer(@Parameter(
@@ -100,8 +100,8 @@ public class UserRestController {
     @Operation(summary = "token verification or get user by id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Correct token and found user by id"),
-            @ApiResponse(responseCode = "204", description = "Correct token"),
-            @ApiResponse(responseCode = "401", description = "Invalid Token")
+            @ApiResponse(responseCode = "204", description = "Correct token", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Invalid Token", content = @Content)
     })
     @GetMapping(value = "/verifier")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")
@@ -116,7 +116,8 @@ public class UserRestController {
 
     @Operation(summary = "search user by email")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User found")
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "404", description = "Email not found", content = @Content)
     })
     @GetMapping(value = "/get-user-by-email")
     @PreAuthorize(value = "hasRole('ADMINISTRADOR') or hasRole('EMPLEADO') or hasRole('PROPIETARIO') or hasRole('CLIENTE')")

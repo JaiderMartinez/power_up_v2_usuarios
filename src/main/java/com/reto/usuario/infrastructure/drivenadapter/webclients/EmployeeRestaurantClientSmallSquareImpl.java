@@ -1,8 +1,8 @@
-package com.reto.usuario.infrastructure.drivenadapter.gateways;
+package com.reto.usuario.infrastructure.drivenadapter.webclients;
 
-import com.reto.usuario.domain.dto.EmployeeRestaurantClientRequestDto;
+import com.reto.usuario.domain.model.EmployeeRestaurantClientModel;
 import com.reto.usuario.domain.exceptions.TokenInvalidException;
-import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
+import com.reto.usuario.domain.spi.clients.IEmployeeRestaurantClientSmallSquare;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class EmployeeRestaurantClientSmallSquareImpl implements IEmployeeRestaur
     private final WebClient webClient;
 
     @Override
-    public void saveUserEmployeeToARestaurant(EmployeeRestaurantClientRequestDto employeeRestaurantClientRequestDto, String tokenWithPrefixBearer) {
+    public void saveUserEmployeeToARestaurant(EmployeeRestaurantClientModel employeeRestaurantClientRequestDto, String tokenWithPrefixBearer) {
         webClient.post().uri(uriBuilder -> uriBuilder.path("restaurant/employee")
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, tokenWithPrefixBearer)

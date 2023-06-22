@@ -1,16 +1,16 @@
 package com.reto.usuario.infrastructure.configurations;
 
 import com.reto.usuario.domain.api.IUserUseCasePort;
-import com.reto.usuario.domain.gateways.IEmployeeRestaurantClientSmallSquare;
-import com.reto.usuario.domain.spi.IRolPersistenceDomainPort;
-import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
+import com.reto.usuario.domain.spi.clients.IEmployeeRestaurantClientSmallSquare;
+import com.reto.usuario.domain.spi.persistence.IRolPersistenceDomainPort;
+import com.reto.usuario.domain.spi.persistence.IUserPersistenceDomainPort;
 import com.reto.usuario.domain.usecase.UserUseCase;
-import com.reto.usuario.infrastructure.drivenadapter.mapper.IRolEntityMapper;
-import com.reto.usuario.infrastructure.drivenadapter.mapper.IUserEntityMapper;
-import com.reto.usuario.infrastructure.drivenadapter.persistence.RolPersistenceDomainPortImpl;
-import com.reto.usuario.infrastructure.drivenadapter.persistence.UserPersistenceDomainPortImpl;
-import com.reto.usuario.infrastructure.drivenadapter.repository.IRolRepositoryMysql;
-import com.reto.usuario.infrastructure.drivenadapter.repository.IUserRepositoryMysql;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.mapper.IRolEntityMapper;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.mapper.IUserEntityMapper;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.adapter.RolPersistenceDomainPortImpl;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.adapter.UserPersistenceDomainPortImpl;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.repository.IRolRepositoryMysql;
+import com.reto.usuario.infrastructure.drivenadapter.jpa.repository.IUserRepositoryMysql;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

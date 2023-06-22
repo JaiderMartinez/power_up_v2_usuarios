@@ -1,10 +1,10 @@
 package com.reto.usuario.domain.usecase;
 
-import com.reto.usuario.domain.dto.AuthCredentials;
+import com.reto.usuario.domain.model.AuthCredentialModel;
 import com.reto.usuario.domain.model.RolModel;
 import com.reto.usuario.domain.model.UserModel;
-import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.spi.TokenServiceInterfacePort;
+import com.reto.usuario.domain.spi.persistence.IUserPersistenceDomainPort;
+import com.reto.usuario.domain.spi.persistence.TokenServiceInterfacePort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,7 +47,7 @@ class AuthUseCaseTest {
         userModelExpected.setEmail("test@gmail.com");
         userModelExpected.setRol(rolModelExpected);
 
-        AuthCredentials authCredentials = new AuthCredentials();
+        AuthCredentialModel authCredentials = new AuthCredentialModel();
         authCredentials.setEmail("test@gmail.com");
         authCredentials.setPassword("12345678");
         List<String> authority = new ArrayList<>();

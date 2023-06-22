@@ -1,6 +1,6 @@
 package com.reto.usuario.infrastructure.drivenadapter.token;
 
-import com.reto.usuario.domain.spi.TokenServiceInterfacePort;
+import com.reto.usuario.domain.spi.persistence.TokenServiceInterfacePort;
 import com.reto.usuario.infrastructure.configurations.security.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 

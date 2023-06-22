@@ -1,8 +1,8 @@
 package com.reto.usuario.infrastructure.configurations;
 
 import com.reto.usuario.domain.api.IAuthUseCasePort;
-import com.reto.usuario.domain.spi.IUserPersistenceDomainPort;
-import com.reto.usuario.domain.spi.TokenServiceInterfacePort;
+import com.reto.usuario.domain.spi.persistence.IUserPersistenceDomainPort;
+import com.reto.usuario.domain.spi.persistence.TokenServiceInterfacePort;
 import com.reto.usuario.domain.usecase.AuthUseCase;
 import com.reto.usuario.infrastructure.configurations.security.utils.TokenUtils;
 import com.reto.usuario.infrastructure.drivenadapter.token.TokenServiceAdapter;
